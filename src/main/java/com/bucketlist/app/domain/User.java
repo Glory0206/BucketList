@@ -21,28 +21,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "아이디를 입력해주세요.")
-    @Column(nullable = false, unique = true)
-    private String memberId;
-
-    @NotBlank(message = "이메일을 입력해주세요.")
-    @Email(message = "올바른 이메일 형식이어야 합니다.")
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "전화번호를 입력해주세요.")
-    @Column(nullable = false)
-    private String phone;
-
-    @NotBlank(message = "닉네임을 입력해주세요.")
     @Column(nullable = false)
     private String nickname;
 
-    @NotBlank(message = "비밀번호를 입력해주세요.")
-    @Pattern(
-            regexp = "^(?=.*[!@#$%^&*(),.?\":{}|<>])[A-Za-z\\d!@#$%^&*(),.?\":{}|<>]{8,15}$",
-            message = "비밀번호는 8~15자이며 특수문자를 하나 이상 포함해야 합니다."
-    )
     @Column(nullable = false)
     private String password;
 
