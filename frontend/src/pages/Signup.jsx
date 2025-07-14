@@ -12,6 +12,7 @@ function Signup() {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const passwordRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,15}$/;
+  const nicknameRegex = /^[a-zA-Z0-9가-힣]{2,15}$/;
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -99,8 +100,15 @@ function Signup() {
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               required
-              className="form-control"
+              className={`form-control ${
+                nickname && !nicknameRegex.test(nickname) ? 'is-invalid' : ''
+              }`}
             />
+            {nickname && !nicknameRegex.test(nickname) && (
+              <div className="invalid-feedback">
+                닉네임은 영어, 한글, 숫자만 사용 가능하며 공백이나 기호는 사용할 수 없습니다.
+              </div>
+            )}
           </div>
           <button type="submit" className='btn btn-success w-100'>SignUp</button>
         </form>
