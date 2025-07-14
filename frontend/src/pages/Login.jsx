@@ -13,7 +13,7 @@ function Login() {
     try{
       const res = await axios.post('http://localhost:8080/api/auth/login', {email, password});
 
-      const token = res.data.token;
+      const token = res.data;
       localStorage.setItem('token', token);
 
       navigate('/bucketlist');
