@@ -51,6 +51,14 @@ function Login() {
             />
           </div>
           <button type="submit" className='btn btn-success w-100'>Login</button>
+          <p className='text-center mt-3'>회원가입을 원하신다면, {' '}
+            <span
+              style={{ color: '#198754', cursor: 'pointer', fontWeight: 'bold' }}
+              onClick={() => navigate('/signup')}>
+              여기
+            </span>
+              를 눌러주세요.
+            </p>
         </form>
       </div>
     </div>
