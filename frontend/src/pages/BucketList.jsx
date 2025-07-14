@@ -24,22 +24,31 @@ function BucketList() {
   if (loading) return <p>Loading...</p>
 
   return (
-    <div>
-      <h2>나의 버킷리스트</h2>
-      {items.length === 0 ? (
-        <p>등록된 버킷 아이템이 없습니다.</p>
-      ) : (
-        <ul>
-          {items.map(item => (
-            <li key = {item.id}>
-              <span>
-                {item.content}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div style={{ backgroundColor: '#d8f3dc', height: '100vh' }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: '80vh' }}
+      >
+        <div className="container p-4 bg-white shadow-lg rounded" style={{ maxWidth: '600px' }}>
+          <h2 className="text-success text-center mb-4">나의 버킷리스트</h2>
+
+          {loading ? (
+            <p className="text-center">불러오는 중...</p>
+          ) : items.length === 0 ? (
+            <p className="text-center text-muted">등록된 버킷 아이템이 없습니다.</p>
+          ) : (
+            <ul className="list-group">
+              {items.map((item) => (
+                <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
+                  {item.content}
+                  {/* 추후 버튼 추가 자리 */}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </div>
-  )
+  );
 }
 export default BucketList;
