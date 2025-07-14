@@ -24,7 +24,7 @@ public class BucketItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BucketItemResponse>> getAll(){
+    public ResponseEntity<List<BucketItemResponse>> getAllBucketItems(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(bucketItemServiceImpl.getAllBucketItems(email));
     }
