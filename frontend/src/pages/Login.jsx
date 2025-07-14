@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -22,24 +23,37 @@ function Login() {
   };
 
   return(
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="이메일"
-        required
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="비밀번호"
-        required
-      />
-      <button type="submit">Login</button>
-    </form>
+    <div style={{ backgroundColor: '#d8f3dc', height: '100vh' }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: '80vh' }}
+      >
+        <form onSubmit={handleSubmit} className='container mt-5 p-4 bg-white shadow-lg rounded' style={{maxWidth: '400px'}}>
+          <h2 className='text-center mb-4'>Login</h2>
+          <div className='mb-3 text-center'>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="이메일"
+              required
+              className="form-control"
+            />
+          </div>
+          <div className='mb-3 text-center'>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호"
+              required
+              className="form-control"
+            />
+          </div>
+          <button type="submit" className='btn btn-success w-100'>Login</button>
+        </form>
+      </div>
+    </div>
   )
 }
 export default Login;
