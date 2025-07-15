@@ -3,6 +3,8 @@ import api from "../services/api";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import EditModeToggle from "../components/EditModeToggle";
+import EditSaveCancelButtons from "../components/EditSaveCancelButtons";
+import EditActionButtons from "../components/EditActionButtons";
 
 function BucketListSplit() {
   const [incompletedItems, setIncompletedItems] = useState([]);
@@ -184,8 +186,10 @@ function BucketListSplit() {
                           placeholderText="날짜 선택"
                           style={{ maxWidth: 150 }}
                         />
-                        <button className="btn btn-success btn-sm me-1" onClick={() => handleSaveEdit(item.id, false)}>저장</button>
-                        <button className="btn btn-secondary btn-sm" onClick={handleCancelEdit}>취소</button>
+                        <EditSaveCancelButtons
+                          onSave={() => handleSaveEdit(item.id, false)}
+                          onCancel={handleCancelEdit}
+                        />
                       </div>
                     ) : (
                       <>
@@ -199,8 +203,10 @@ function BucketListSplit() {
                         </span>
                         {editMode && (
                           <div>
-                            <button className="btn btn-outline-primary btn-sm me-2" onClick={() => handleEdit(item)}>수정</button>
-                            <button className="btn btn-outline-danger btn-sm" onClick={() => handleDelete(item.id, false)}>삭제</button>
+                            <EditActionButtons
+                              onEdit={() => handleEdit(item)}
+                              onDelete={() => handleDelete(item.id, false)}
+                            />
                           </div>
                         )}
                       </>
@@ -233,8 +239,10 @@ function BucketListSplit() {
                           placeholderText="날짜 선택"
                           style={{ maxWidth: 150 }}
                         />
-                        <button className="btn btn-success btn-sm me-1" onClick={() => handleSaveEdit(item.id, true)}>저장</button>
-                        <button className="btn btn-secondary btn-sm" onClick={handleCancelEdit}>취소</button>
+                        <EditSaveCancelButtons
+                          onSave={() => handleSaveEdit(item.id, true)}
+                          onCancel={handleCancelEdit}
+                        />
                       </div>
                     ) : (
                       <>
@@ -248,8 +256,10 @@ function BucketListSplit() {
                         </span>
                         {editMode && (
                           <div>
-                            <button className="btn btn-outline-primary btn-sm me-2" onClick={() => handleEdit(item)}>수정</button>
-                            <button className="btn btn-outline-danger btn-sm" onClick={() => handleDelete(item.id, true)}>삭제</button>
+                            <EditActionButtons
+                              onEdit={() => handleEdit(item)}
+                              onDelete={() => handleDelete(item.id, true)}
+                            />
                           </div>
                         )}
                       </>

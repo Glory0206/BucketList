@@ -3,6 +3,7 @@ import api from "../services/api";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import EditModeToggle from "../components/EditModeToggle";
+import EditSaveCancelButtons from "../components/EditSaveCancelButtons";
 
 function BucketListAll() {
   const [items, setItems] = useState([]);
@@ -167,8 +168,10 @@ function BucketListAll() {
                         placeholderText="날짜 선택"
                         style={{ maxWidth: 150 }}
                       />
-                      <button className="btn btn-success btn-sm me-1" onClick={() => handleSaveEdit(item.id)}>저장</button>
-                      <button className="btn btn-secondary btn-sm" onClick={handleCancelEdit}>취소</button>
+                      <EditSaveCancelButtons
+                        onSave={() => handleSaveEdit(item.id)}
+                        onCancel={handleCancelEdit}
+                      />
                     </div>
                   ) : (
                     <>
