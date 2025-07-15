@@ -20,7 +20,7 @@ function Header(){
                     {isLoggedIn ? (
                         <>
                             <span className="me-3 fw-bold text-success">{nickname ? `${nickname}님` : '사용자'}</span>
-                            <button className="btn btn-outline-success btn-sm" onClick={handleLogout}>
+                            <button className="text-success me-2" style={{ cursor: 'pointer', border: 'none', background: 'none', padding: 0 }} onClick={handleLogout}>
                                 로그아웃
                             </button>
                         </>
