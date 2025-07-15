@@ -11,7 +11,10 @@ public interface BucketItemService {
 
 
     //해당 사용자의 버킷 리스트 항목 조회
-    List<BucketItemResponse> getList(String email);
+    List<BucketItemResponse> getAllBucketItems(String email);
+    List<BucketItemResponse> getCompletedBucketItems(String email);
+    List<BucketItemResponse> getIncompleteBucketItems(String email);
+
 
     // 버킷 항목 수정
     void update(Long id, BucketItemRequest request);

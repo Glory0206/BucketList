@@ -24,9 +24,21 @@ public class BucketItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BucketItemResponse>> getAll(){
+    public ResponseEntity<List<BucketItemResponse>> getAllBucketItems(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(bucketItemServiceImpl.getList(email));
+        return ResponseEntity.ok(bucketItemServiceImpl.getAllBucketItems(email));
+    }
+
+    @GetMapping("/completed")
+    public ResponseEntity<List<BucketItemResponse>> getCompletedBucketItems(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(bucketItemServiceImpl.getCompletedBucketItems(email));
+    }
+
+    @GetMapping("/incompleted")
+    public ResponseEntity<List<BucketItemResponse>> getIncompletedBucketItems(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(bucketItemServiceImpl.getIncompleteBucketItems(email));
     }
 
     @PutMapping("/{id}")
