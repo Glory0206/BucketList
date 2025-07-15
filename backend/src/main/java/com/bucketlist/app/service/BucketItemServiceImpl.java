@@ -31,7 +31,7 @@ public class BucketItemServiceImpl implements BucketItemService{
         bucketItemRepository.save(item);
     }
 
-    public List<BucketItemResponse> getList(String email){
+    public List<BucketItemResponse> getAllBucketItems(String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
@@ -43,7 +43,34 @@ public class BucketItemServiceImpl implements BucketItemService{
                         .dueDate(item.getDueDate())
                         .build())
                 .toList();
+    }
 
+    public List<BucketItemResponse> getCompletedBucketItems(String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+
+        return bucketItemRepository.findByUserAndCompleted(user, true).stream()
+                .map(item -> BucketItemResponse.builder()
+                        .id(item.getId())
+                        .content(item.getContent())
+                        .completed(item.isCompleted())
+                        .dueDate(item.getDueDate())
+                        .build())
+                .toList();
+    }
+
+    public List<BucketItemResponse> getIncompleteBucketItems(String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+
+        return bucketItemRepository.findByUserAndCompleted(user, false).stream()
+                .map(item -> BucketItemResponse.builder()
+                        .id(item.getId())
+                        .content(item.getContent())
+                        .completed(item.isCompleted())
+                        .dueDate(item.getDueDate())
+                        .build())
+                .toList();
     }
 
     public void update(Long id, BucketItemRequest request){
