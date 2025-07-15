@@ -41,6 +41,12 @@ public class AuthController {
 
         String token = jwtTokenProvider.createToken(user.getEmail());
 
-        return ResponseEntity.ok().body(token); // fornt가 token을 저장하여 사용
+        // 토큰과 닉네임 정보를 함께 응답
+        return ResponseEntity.ok().body(
+                java.util.Map.of(
+                        "token", token,
+                        "nickname", user.getNickname()
+                )
+        );
     }
 }
