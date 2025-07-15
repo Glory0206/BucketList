@@ -18,7 +18,7 @@ function Login() {
       localStorage.setItem('token', token);
       localStorage.setItem('nickname', nickname);
 
-      navigate('/bucketlist');
+      navigate('/bucketlist/all');
     } catch(err){
       alert('로그인 실패: ' + err.response?.data?.message || '서버 오류');
     }

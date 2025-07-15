@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import EditModeToggle from "../components/EditModeToggle";
 import EditSaveCancelButtons from "../components/EditSaveCancelButtons";
+import EditActionButtons from "../components/EditActionButtons";
 
 function BucketListAll() {
   const [items, setItems] = useState([]);
@@ -15,6 +17,7 @@ function BucketListAll() {
   const [editContent, setEditContent] = useState('');
   const [editDueDate, setEditDueDate] = useState(null);
   const dateInputRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -98,7 +101,12 @@ function BucketListAll() {
     <div style={{ backgroundColor: '#d8f3dc', height: '100vh' }}>
       <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
         <div className="container p-4 bg-white shadow-lg rounded" style={{ maxWidth: '600px' }}>
-          <h2 className="text-success text-center mb-4">BucketList (전체)</h2>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h2 className="text-success mb-0">BucketList (전체)</h2>
+            <button className="btn btn-outline-success btn-sm" onClick={() => navigate('/bucketlist/split')}>
+              미완료/완료 분리 보기
+            </button>
+          </div>
           <div className="mb-3 text-end">
             <EditModeToggle editMode={editMode} setEditMode={setEditMode} />
           </div>
@@ -184,11 +192,13 @@ function BucketListAll() {
                         )}
                       </span>
                       {editMode && (
-                        <div>
-                          <button className="btn btn-outline-primary btn-sm me-2" onClick={() => handleEdit(item)}>수정</button>
-                          <button className="btn btn-outline-danger btn-sm" onClick={() => handleDelete(item.id)}>삭제</button>
-                        </div>
-                      )}
+                          <div>
+                            <EditActionButtons
+                              onEdit={() => handleEdit(item)}
+                              onDelete={() => handleDelete(item.id, true)}
+                            />
+                          </div>
+                        )}
                     </>
                   )}
                 </li>

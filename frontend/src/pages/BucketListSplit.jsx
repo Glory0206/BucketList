@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -17,7 +18,8 @@ function BucketListSplit() {
   const [editContent, setEditContent] = useState('');
   const [editDueDate, setEditDueDate] = useState(null);
   const dateInputRef = useRef(null);
-
+  const navigate = useNavigate();
+    
   useEffect(() => {
     const fetchItems = async () => {
       setLoading(true);
@@ -117,7 +119,12 @@ function BucketListSplit() {
     <div style={{ backgroundColor: '#d8f3dc', height: '100vh' }}>
       <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
         <div className="container p-4 bg-white shadow-lg rounded" style={{ maxWidth: '1100px' }}>
-          <h2 className="text-success text-center mb-4">BucketList (미완료/완료 분리)</h2>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h2 className="text-success mb-0">BucketList (미완료/완료 분리)</h2>
+            <button className="btn btn-outline-success btn-sm" onClick={() => navigate('/bucketlist/all')}>
+              전체 리스트 보기
+            </button>
+          </div>
           <div className="mb-3 text-end">
             <EditModeToggle editMode={editMode} setEditMode={setEditMode} />
           </div>
