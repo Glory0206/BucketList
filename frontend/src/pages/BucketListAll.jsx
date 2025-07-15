@@ -1,37 +1,30 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import EditModeToggle from "../components/EditModeToggle";
+import EditSaveCancelButtons from "../components/EditSaveCancelButtons";
+import EditActionButtons from "../components/EditActionButtons";
 
-function BucketList() {
+function BucketListAll() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newItem, setNewItem] = useState('');
   const [dueDate, setDueDate] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const [editId, setEditId] = useState(null); // 수정 중인 아이템 id
-  const [editContent, setEditContent] = useState(''); // 수정 중인 내용
-  const [editDueDate, setEditDueDate] = useState(null); // 수정 중인 날짜
-  const [filter, setFilter] = useState('all');
+  const [editId, setEditId] = useState(null);
+  const [editContent, setEditContent] = useState('');
+  const [editDueDate, setEditDueDate] = useState(null);
   const dateInputRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchItems = async () => {
       setLoading(true);
       try {
-        let response;
-        if (filter === 'all') {
-          response = await api.get('/bucket');
-        } else if (filter === 'completed') {
-          response = await api.get('/bucket/completed');
-        } else if (filter === 'incompleted') {
-          response = await api.get('/bucket/incompleted');
-        }
-        if (response && response.data) {
-          setItems(response.data);
-        } else {
-          setItems([]);
-        }
+        const response = await api.get('/bucket');
+        setItems(response.data);
       } catch (error) {
         setItems([]);
         alert('버킷리스트를 불러오지 못했습니다.');
@@ -40,16 +33,14 @@ function BucketList() {
       }
     };
     fetchItems();
-  }, [filter]);
+  }, []);
 
   const handleAddItem = async () => {
     if (!newItem.trim()) return;
     try {
       const response = await api.post('/bucket', { content: newItem, dueDate: dueDate ? dueDate.toISOString().split('T')[0] : null });
       if (response.data) {
-        if (filter === 'all' || filter === 'incompleted') {
-          setItems([...items, response.data]);
-        }
+        setItems([...items, response.data]);
         setNewItem('');
         setDueDate(null);
       } else {
@@ -104,41 +95,21 @@ function BucketList() {
     }
   };
 
-  if (loading) return <p>Loading...</p>
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div style={{ backgroundColor: '#d8f3dc', height: '100vh' }}>
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: '80vh' }}
-      >
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
         <div className="container p-4 bg-white shadow-lg rounded" style={{ maxWidth: '600px' }}>
-          <h2 className="text-success text-center mb-4">BucketList</h2>
-
-          <div className="mb-3 text-end">
-            <button
-              className={`btn btn-${editMode ? 'secondary' : 'outline-secondary'} btn-sm`}
-              onClick={() => setEditMode(!editMode)}
-            >
-              {editMode ? '편집 종료' : '편집'}
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h2 className="text-success mb-0">BucketList (전체)</h2>
+            <button className="btn btn-outline-success btn-sm" onClick={() => navigate('/bucketlist/split')}>
+              미완료/완료 분리 보기
             </button>
           </div>
-
-          <div className="mb-3 text-center">
-            <button
-              className={`btn btn-sm me-2 ${filter === 'all' ? 'btn-success' : 'btn-outline-success'}`}
-              onClick={() => setFilter('all')}
-            >전체</button>
-            <button
-              className={`btn btn-sm me-2 ${filter === 'completed' ? 'btn-success' : 'btn-outline-success'}`}
-              onClick={() => setFilter('completed')}
-            >완료</button>
-            <button
-              className={`btn btn-sm ${filter === 'incompleted' ? 'btn-success' : 'btn-outline-success'}`}
-              onClick={() => setFilter('incompleted')}
-            >미완료</button>
+          <div className="mb-3 text-end">
+            <EditModeToggle editMode={editMode} setEditMode={setEditMode} />
           </div>
-
           <div className="input-group mb-3">
             <input
               type="text"
@@ -150,28 +121,28 @@ function BucketList() {
               style={{ zIndex: 1 }}
             />
             <ReactDatePicker
-                selected={dueDate}
-                onChange={date => setDueDate(date)}
-                dateFormat="yyyy-MM-dd"
-                placeholderText="날짜 선택"
-                className="form-control"
-                popperPlacement="top" // 달력이 input 위에 뜨도록
-                minDate={new Date()} // 오늘 이전 날짜는 선택 불가
-                customInput={
-                  <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    tabIndex={-1}
-                    style={{ background: 'white', borderLeft: 'none', borderColor: '#e0e0e0' }}
-                  >
-                    <span role="img" aria-label="달력">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#198754" viewBox="0 0 16 16">
-                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-1h12a1 1 0 0 1 1 1v1H1V4a1 1 0 0 1 1-1z"/>
-                      </svg>
-                    </span>
-                  </button>
-                }
-              />
+              selected={dueDate}
+              onChange={date => setDueDate(date)}
+              dateFormat="yyyy-MM-dd"
+              placeholderText="날짜 선택"
+              className="form-control"
+              popperPlacement="top"
+              minDate={new Date()}
+              customInput={
+                <button
+                  className="btn btn-outline-secondary"
+                  type="button"
+                  tabIndex={-1}
+                  style={{ background: 'white', borderLeft: 'none', borderColor: '#e0e0e0' }}
+                >
+                  <span role="img" aria-label="달력">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#198754" viewBox="0 0 16 16">
+                      <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-1h12a1 1 0 0 1 1 1v1H1V4a1 1 0 0 1 1-1z"/>
+                    </svg>
+                  </span>
+                </button>
+              }
+            />
             <button className="btn btn-success" onClick={handleAddItem}>추가</button>
           </div>
           <div className="mb-2 text-end" style={{ fontSize: '0.9em', color: '#198754' }}>
@@ -179,7 +150,6 @@ function BucketList() {
               ? `희망 날짜: ${dueDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}`
               : '완료 희망일을 선택하세요(미선택 가능)'}
           </div>
-
           {loading ? (
             <p className="text-center">불러오는 중...</p>
           ) : items.length === 0 ? (
@@ -206,8 +176,10 @@ function BucketList() {
                         placeholderText="날짜 선택"
                         style={{ maxWidth: 150 }}
                       />
-                      <button className="btn btn-success btn-sm me-1" onClick={() => handleSaveEdit(item.id)}>저장</button>
-                      <button className="btn btn-secondary btn-sm" onClick={handleCancelEdit}>취소</button>
+                      <EditSaveCancelButtons
+                        onSave={() => handleSaveEdit(item.id)}
+                        onCancel={handleCancelEdit}
+                      />
                     </div>
                   ) : (
                     <>
@@ -220,11 +192,13 @@ function BucketList() {
                         )}
                       </span>
                       {editMode && (
-                        <div>
-                          <button className="btn btn-outline-primary btn-sm me-2" onClick={() => handleEdit(item)}>수정</button>
-                          <button className="btn btn-outline-danger btn-sm" onClick={() => handleDelete(item.id)}>삭제</button>
-                        </div>
-                      )}
+                          <div>
+                            <EditActionButtons
+                              onEdit={() => handleEdit(item)}
+                              onDelete={() => handleDelete(item.id, true)}
+                            />
+                          </div>
+                        )}
                     </>
                   )}
                 </li>
@@ -236,4 +210,4 @@ function BucketList() {
     </div>
   );
 }
-export default BucketList;
+export default BucketListAll;
