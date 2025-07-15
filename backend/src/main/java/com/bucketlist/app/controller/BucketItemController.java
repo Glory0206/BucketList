@@ -17,10 +17,9 @@ public class BucketItemController {
     private final BucketItemServiceImpl bucketItemServiceImpl;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody BucketItemRequest request){
+    public ResponseEntity<BucketItemResponse> create(@RequestBody BucketItemRequest request){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        bucketItemServiceImpl.create(email, request);
-        return ResponseEntity.ok("등록 완료");
+        return ResponseEntity.ok(bucketItemServiceImpl.create(email, request));
     }
 
     @GetMapping
