@@ -17,7 +17,8 @@ public class BucketItemServiceImpl implements BucketItemService{
     private final UserRepository userRepository;
     private final BucketItemRepository bucketItemRepository;
 
-    public void create(String email, BucketItemRequest request){
+    @Override
+    public BucketItemResponse create(String email, BucketItemRequest request){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
@@ -29,8 +30,16 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .build();
 
         bucketItemRepository.save(item);
+
+        return BucketItemResponse.builder()
+                .id(item.getId())
+                .content(item.getContent())
+                .completed(item.isCompleted())
+                .dueDate(item.getDueDate())
+                .build();
     }
 
+    @Override
     public List<BucketItemResponse> getAllBucketItems(String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
@@ -45,6 +54,7 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .toList();
     }
 
+    @Override
     public List<BucketItemResponse> getCompletedBucketItems(String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
@@ -59,6 +69,7 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .toList();
     }
 
+    @Override
     public List<BucketItemResponse> getIncompleteBucketItems(String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
@@ -73,6 +84,7 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .toList();
     }
 
+    @Override
     public void update(Long id, BucketItemRequest request){
         BucketItem item = bucketItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
@@ -82,6 +94,7 @@ public class BucketItemServiceImpl implements BucketItemService{
         bucketItemRepository.save(item);
     }
     
+    @Override
     public void delete(Long id){
         bucketItemRepository.deleteById(id);
     }
