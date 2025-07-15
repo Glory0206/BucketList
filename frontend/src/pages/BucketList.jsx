@@ -8,28 +8,37 @@ function BucketList() {
   const [loading, setLoading] = useState(true);
   const [newItem, setNewItem] = useState('');
   const [dueDate, setDueDate] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState(null); // 수정 중인 아이템 id
+  const [editContent, setEditContent] = useState(''); // 수정 중인 내용
+  const [editDueDate, setEditDueDate] = useState(null); // 수정 중인 날짜
   const [filter, setFilter] = useState('all');
+  const dateInputRef = useRef(null);
 
   useEffect(() => {
     const fetchItems = async () => {
-      try{
+      setLoading(true);
+      try {
         let response;
-        if (filter === 'all'){
+        if (filter === 'all') {
           response = await api.get('/bucket');
-        } else if (filter === 'completed'){
+        } else if (filter === 'completed') {
           response = await api.get('/bucket/completed');
-        } else if (filter === 'incompleted'){
+        } else if (filter === 'incompleted') {
           response = await api.get('/bucket/incompleted');
         }
-        setItems(response.data);
-      } catch (error){
-        console.error('아이템 불러오기 실패: ', error);
+        if (response && response.data) {
+          setItems(response.data);
+        } else {
+          setItems([]);
+        }
+      } catch (error) {
+        setItems([]);
         alert('버킷리스트를 불러오지 못했습니다.');
-      } finally{
+      } finally {
         setLoading(false);
       }
     };
-
     fetchItems();
   }, [filter]);
 
@@ -38,7 +47,9 @@ function BucketList() {
     try {
       const response = await api.post('/bucket', { content: newItem, dueDate: dueDate ? dueDate.toISOString().split('T')[0] : null });
       if (response.data) {
-        setItems([...items, response.data]);
+        if (filter === 'all' || filter === 'incompleted') {
+          setItems([...items, response.data]);
+        }
         setNewItem('');
         setDueDate(null);
       } else {
@@ -46,6 +57,50 @@ function BucketList() {
       }
     } catch (error) {
       alert('버킷 아이템 등록 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 삭제 기능
+  const handleDelete = async (id) => {
+    if (!window.confirm('정말 삭제하시겠습니까?')) return;
+    try {
+      await api.delete(`/bucket/${id}`);
+      setItems(items.filter(item => item.id !== id));
+    } catch (error) {
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 수정 모드 진입
+  const handleEdit = (item) => {
+    setEditId(item.id);
+    setEditContent(item.content);
+    setEditDueDate(item.dueDate ? new Date(item.dueDate) : null);
+  };
+
+  // 수정 취소
+  const handleCancelEdit = () => {
+    setEditId(null);
+    setEditContent('');
+    setEditDueDate(null);
+  };
+
+  // 수정 저장
+  const handleSaveEdit = async (id) => {
+    if (!editContent.trim()) return;
+    try {
+      await api.put(`/bucket/${id}`, {
+        content: editContent,
+        dueDate: editDueDate ? editDueDate.toISOString().split('T')[0] : null
+      });
+      setItems(items.map(item =>
+        item.id === id
+          ? { ...item, content: editContent, dueDate: editDueDate ? editDueDate.toISOString().split('T')[0] : null }
+          : item
+      ));
+      handleCancelEdit();
+    } catch (error) {
+      alert('수정 중 오류가 발생했습니다.');
     }
   };
 
@@ -59,6 +114,15 @@ function BucketList() {
       >
         <div className="container p-4 bg-white shadow-lg rounded" style={{ maxWidth: '600px' }}>
           <h2 className="text-success text-center mb-4">BucketList</h2>
+
+          <div className="mb-3 text-end">
+            <button
+              className={`btn btn-${editMode ? 'secondary' : 'outline-secondary'} btn-sm`}
+              onClick={() => setEditMode(!editMode)}
+            >
+              {editMode ? '편집 종료' : '편집'}
+            </button>
+          </div>
 
           <div className="mb-3 text-center">
             <button
@@ -113,7 +177,7 @@ function BucketList() {
           <div className="mb-2 text-end" style={{ fontSize: '0.9em', color: '#198754' }}>
             {dueDate
               ? `희망 날짜: ${dueDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}`
-              : '완료 희망일을 선택하세요'}
+              : '완료 희망일을 선택하세요(미선택 가능)'}
           </div>
 
           {loading ? (
@@ -124,8 +188,45 @@ function BucketList() {
             <ul className="list-group">
               {items.map((item) => (
                 <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
-                  {item.content}
-                  {/* 추후 버튼 추가 자리 */}
+                  {editId === item.id ? (
+                    <div className="w-100 d-flex align-items-center">
+                      <input
+                        type="text"
+                        className="form-control me-2"
+                        value={editContent}
+                        onChange={e => setEditContent(e.target.value)}
+                        style={{ maxWidth: 200 }}
+                      />
+                      <ReactDatePicker
+                        selected={editDueDate}
+                        onChange={date => setEditDueDate(date)}
+                        dateFormat="yyyy-MM-dd"
+                        className="form-control me-2"
+                        minDate={new Date()}
+                        placeholderText="날짜 선택"
+                        style={{ maxWidth: 150 }}
+                      />
+                      <button className="btn btn-success btn-sm me-1" onClick={() => handleSaveEdit(item.id)}>저장</button>
+                      <button className="btn btn-secondary btn-sm" onClick={handleCancelEdit}>취소</button>
+                    </div>
+                  ) : (
+                    <>
+                      <span>
+                        {item.content}
+                        {item.dueDate && (
+                          <span style={{ color: '#198754', fontSize: '0.9em', marginLeft: 8 }}>
+                            ({new Date(item.dueDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })})
+                          </span>
+                        )}
+                      </span>
+                      {editMode && (
+                        <div>
+                          <button className="btn btn-outline-primary btn-sm me-2" onClick={() => handleEdit(item)}>수정</button>
+                          <button className="btn btn-outline-danger btn-sm" onClick={() => handleDelete(item.id)}>삭제</button>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </li>
               ))}
             </ul>
