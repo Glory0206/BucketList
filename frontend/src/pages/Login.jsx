@@ -14,7 +14,9 @@ function Login() {
       const res = await axios.post('http://localhost:8080/api/auth/login', {email, password});
 
       const token = res.data.token;
+      const nickname = res.data.nickname;
       localStorage.setItem('token', token);
+      localStorage.setItem('nickname', nickname);
 
       navigate('/bucketlist');
     } catch(err){
