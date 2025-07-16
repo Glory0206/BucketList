@@ -4,6 +4,7 @@ import com.bucketlist.app.dto.BucketItemRequest;
 import com.bucketlist.app.dto.BucketItemResponse;
 import com.bucketlist.app.service.BucketItemServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -50,5 +51,11 @@ public class BucketItemController {
     public ResponseEntity<?> delete(@PathVariable Long id){
         bucketItemServiceImpl.delete(id);
         return ResponseEntity.ok("삭제 완료");
+    }
+
+    @PostMapping("/bucket-item/{id}/file")
+    public ResponseEntity<?> uploadFile(@PathVariable Long id, @RequestParam("file") MultipartFile file){  
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(bucketItemServiceImpl.uploadFile(id, file, email));
     }
 }

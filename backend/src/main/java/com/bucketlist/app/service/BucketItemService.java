@@ -2,6 +2,7 @@ package com.bucketlist.app.service;
 
 import com.bucketlist.app.dto.BucketItemRequest;
 import com.bucketlist.app.dto.BucketItemResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface BucketItemService {
 
     // 버킷 항목 삭제
     void delete(Long id);
+
+    String uploadFile(Long id, MultipartFile file, String email);
 }
