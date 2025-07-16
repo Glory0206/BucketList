@@ -1,9 +1,12 @@
 package com.bucketlist.app.domain;
 
+import com.bucketlist.app.domain.FileUpload;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,4 +31,7 @@ public class BucketItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "bucketItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FileUpload> files = new ArrayList<>();
 }
