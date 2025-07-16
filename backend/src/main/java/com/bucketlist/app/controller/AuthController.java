@@ -6,7 +6,7 @@ import com.bucketlist.app.dto.UserPasswordResetRequest;
 import com.bucketlist.app.dto.UserSignupRequest;
 import com.bucketlist.app.repository.UserRepository;
 import com.bucketlist.app.security.JwtTokenProvider;
-import com.bucketlist.app.service.UserService;
+import com.bucketlist.app.service.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor // final 선언된 필드 자동 생성자 주입
 public class AuthController {
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;

@@ -22,6 +22,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     public void sendPasswordResetEmail(String email, String tempPassword){
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
+        message.setFrom("dmb5627@naver.com");
         message.setSubject("임시 비밀번호 발급");
         message.setText("임시 비밀번호: " + tempPassword);
         mailSender.send(message);
