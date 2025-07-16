@@ -2,6 +2,7 @@ package com.bucketlist.app.controller;
 
 import com.bucketlist.app.domain.User;
 import com.bucketlist.app.dto.UserLoginRequest;
+import com.bucketlist.app.dto.UserPasswordResetRequest;
 import com.bucketlist.app.dto.UserSignupRequest;
 import com.bucketlist.app.repository.UserRepository;
 import com.bucketlist.app.security.JwtTokenProvider;
@@ -48,5 +49,11 @@ public class AuthController {
                         "nickname", user.getNickname()
                 )
         );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody @Valid UserPasswordResetRequest request){
+        userService.resetPassword(request);
+        return ResponseEntity.ok("임시 비밀번호가 이메일로 전송되었습니다.");
     }
 }
