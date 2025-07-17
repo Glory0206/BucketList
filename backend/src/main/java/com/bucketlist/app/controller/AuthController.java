@@ -2,9 +2,12 @@ package com.bucketlist.app.controller;
 
 import com.bucketlist.app.domain.User;
 import com.bucketlist.app.dto.UserLoginRequest;
+import com.bucketlist.app.dto.ResetPasswordRequest;
+import com.bucketlist.app.dto.CreatePasswordCordRequest;
 import com.bucketlist.app.dto.UserSignupRequest;
 import com.bucketlist.app.repository.UserRepository;
 import com.bucketlist.app.security.JwtTokenProvider;
+import com.bucketlist.app.service.ResetPasswordService;
 import com.bucketlist.app.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +26,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final ResetPasswordService resetPasswordService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid UserSignupRequest request){
@@ -48,5 +52,21 @@ public class AuthController {
                         "nickname", user.getNickname()
                 )
         );
+    }
+
+    @PostMapping("/create-code")
+    public ResponseEntity<?> createCode(@RequestBody @Valid CreatePasswordCordRequest request){
+        resetPasswordService.sendCode(request.getEmail());
+        return ResponseEntity.ok("코드가 이메일로 전송되었습니다.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest request){
+        boolean result = resetPasswordService.resetPassword(request);
+        if(result){
+            return ResponseEntity.ok("비밀번호가 변경되었습니다.");
+        } else {
+            return ResponseEntity.badRequest().body("비밀번호 변경에 실패했습니다.");
+        }
     }
 }
