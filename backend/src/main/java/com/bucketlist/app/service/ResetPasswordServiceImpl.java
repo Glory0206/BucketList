@@ -1,7 +1,5 @@
 package com.bucketlist.app.service;
 
-import java.util.UUID;
-
 import org.springframework.stereotype.Service;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,21 +8,28 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class PasswordResetServiceImpl implements PasswordResetService {
+public class ResetPasswordServiceImpl implements ResetPasswordService {
     private final JavaMailSender mailSender;
 
     @Override
-    public String generateTempPassword() {// 임시 비밀번호 생성
-        return UUID.randomUUID().toString().substring(0, 10);
+        public String createRandomCode() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            char c = (char) ('A' + (int)(Math.random() * 26));
+            sb.append(c);
+        }
+        return sb.toString();
     }
 
     @Override
-    public void sendPasswordResetEmail(String email, String tempPassword){// 임시 비밀번호 이메일 발송송
+    public void sendCode(String email){
+        String code = createRandomCode();
         SimpleMailMessage message = new SimpleMailMessage();
+
         message.setTo(email);
         message.setFrom("dmb5627@naver.com");
-        message.setSubject("임시 비밀번호 발급");
-        message.setText("임시 비밀번호: " + tempPassword);
+        message.setSubject("코드 발급");
+        message.setText("코드: " + code);
         mailSender.send(message);
     }
 }

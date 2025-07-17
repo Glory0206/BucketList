@@ -2,10 +2,11 @@ package com.bucketlist.app.controller;
 
 import com.bucketlist.app.domain.User;
 import com.bucketlist.app.dto.UserLoginRequest;
-import com.bucketlist.app.dto.UserPasswordResetRequest;
+import com.bucketlist.app.dto.UserResetPasswordRequest;
 import com.bucketlist.app.dto.UserSignupRequest;
 import com.bucketlist.app.repository.UserRepository;
 import com.bucketlist.app.security.JwtTokenProvider;
+import com.bucketlist.app.service.ResetPasswordService;
 import com.bucketlist.app.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final ResetPasswordService resetPasswordService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid UserSignupRequest request){
@@ -52,8 +54,8 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody @Valid UserPasswordResetRequest request){
-        userService.resetPassword(request);
-        return ResponseEntity.ok("임시 비밀번호가 이메일로 전송되었습니다.");
+    public ResponseEntity<?> resetPassword(@RequestBody @Valid UserResetPasswordRequest request){
+        resetPasswordService.sendCode(request.getEmail());
+        return ResponseEntity.ok("코드가 이메일로 전송되었습니다.");
     }
 }
