@@ -26,7 +26,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     private final String uploadDir = System.getProperty("user.dir") + "/uploads";
 
     @Override
-    public BucketItemResponse create(String email, BucketItemRequest request){
+    public BucketItemResponse create(String email, BucketItemRequest request){// 버킷 리스트 항목 생성
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
@@ -48,7 +48,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
-    public List<BucketItemResponse> getAllBucketItems(String email){
+    public List<BucketItemResponse> getAllBucketItems(String email){// 해당 사용자의 버킷 리스트 항목 조회
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
@@ -63,7 +63,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
-    public List<BucketItemResponse> getCompletedBucketItems(String email){
+    public List<BucketItemResponse> getCompletedBucketItems(String email){// 해당 사용자의 완료된 버킷 리스트 항목 조회
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
@@ -78,7 +78,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
-    public List<BucketItemResponse> getIncompleteBucketItems(String email){
+    public List<BucketItemResponse> getIncompleteBucketItems(String email){// 해당 사용자의 미완료된 버킷 리스트 항목 조회
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
@@ -93,7 +93,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
-    public void update(Long id, BucketItemRequest request){
+    public void update(Long id, BucketItemRequest request){// 버킷 항목 수정
         BucketItem item = bucketItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
 
@@ -103,12 +103,12 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
     
     @Override
-    public void delete(Long id){
+    public void delete(Long id){// 버킷 항목 삭제
         bucketItemRepository.deleteById(id);
     }
 
     @Override
-    public String uploadFile(Long id, MultipartFile file, String email){
+    public String uploadFile(Long id, MultipartFile file, String email){// 버킷 항목 파일 업로드
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
         

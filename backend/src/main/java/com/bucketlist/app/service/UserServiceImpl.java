@@ -17,7 +17,7 @@ public class UserServiceImpl implements UserService{
     private final PasswordResetService passwordResetService;
 
     @Override
-    public void signup(UserSignupRequest request){
+    public void signup(UserSignupRequest request){// 회원가입
         if(userRepository.existsByEmail(request.getEmail())){
             throw new IllegalStateException("이미 가입된 이메일입니다.");
         }
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void resetPassword(UserPasswordResetRequest request){
+    public void resetPassword(UserPasswordResetRequest request){// 비밀번호 초기화
         User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
     
