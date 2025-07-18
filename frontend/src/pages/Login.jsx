@@ -20,7 +20,8 @@ function Login() {
 
       navigate('/bucketlist/all');
     } catch(err){
-      alert('로그인 실패: ' + err.response?.data?.message || '서버 오류');
+      const msg = err.response?.data?.message || '서버 오류';
+      alert('로그인 실패: ' + msg);
     }
   };
 
