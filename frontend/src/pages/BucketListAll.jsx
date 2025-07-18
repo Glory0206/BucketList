@@ -27,7 +27,8 @@ function BucketListAll() {
         setItems(response.data);
       } catch (error) {
         setItems([]);
-        alert('버킷리스트를 불러오지 못했습니다.');
+        const msg = error.response?.data?.message || '버킷리스트를 불러오지 못했습니다.';
+        alert(msg);
       } finally {
         setLoading(false);
       }
@@ -47,7 +48,8 @@ function BucketListAll() {
         alert('버킷 아이템 등록에 실패했습니다.');
       }
     } catch (error) {
-      alert('버킷 아이템 등록 중 오류가 발생했습니다.');
+      const msg = error.response?.data?.message || '버킷 아이템 등록 중 오류가 발생했습니다.';
+      alert(msg);
     }
   };
 
@@ -58,7 +60,8 @@ function BucketListAll() {
       await api.delete(`/bucket/${id}`);
       setItems(items.filter(item => item.id !== id));
     } catch (error) {
-      alert('삭제 중 오류가 발생했습니다.');
+      const msg = error.response?.data?.message || '삭제 중 오류가 발생했습니다.';
+      alert(msg);
     }
   };
 
@@ -91,7 +94,8 @@ function BucketListAll() {
       ));
       handleCancelEdit();
     } catch (error) {
-      alert('수정 중 오류가 발생했습니다.');
+      const msg = error.response?.data?.message || '수정 중 오류가 발생했습니다.';
+      alert(msg);
     }
   };
 

@@ -31,8 +31,8 @@ function Signup() {
       alert('회원가입이 완료되었습니다.');
       navigate('/login');
     } catch (err){
-      console.error('회원가입 error: ', err);
-      alert('회원가입 실패: ' + (err.response?.data?.message || '서버 오류'));
+      const msg = err.response?.data?.message || '서버 오류';
+      alert('회원가입 실패: ' + msg);
     }
   }
 
