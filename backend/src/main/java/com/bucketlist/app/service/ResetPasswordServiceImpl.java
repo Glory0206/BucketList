@@ -10,7 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import com.bucketlist.app.domain.User;
 import com.bucketlist.app.repository.UserRepository;
-import com.bucketlist.app.dto.CodeVerifyRequest;
+import com.bucketlist.app.dto.ResetPasswordRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,7 +50,7 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
     }
 
     @Override
-    public boolean resetPassword(CodeVerifyRequest request){
+    public boolean resetPassword(ResetPasswordRequest request){
 
         String email = codeToEmailStore.get(request.getCode());
 
