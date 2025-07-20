@@ -53,6 +53,18 @@ public class BucketItemController {
         return ResponseEntity.ok("삭제 완료");
     }
 
+    @PutMapping("/{id}/complete")
+    public ResponseEntity<?> complete(@PathVariable Long id){
+        bucketItemService.complete(id);
+        return ResponseEntity.ok("완료 처리 완료");
+    }
+
+    @PutMapping("/{id}/uncomplete")
+    public ResponseEntity<?> uncomplete(@PathVariable Long id){
+        bucketItemService.uncomplete(id);
+        return ResponseEntity.ok("미완료 처리 완료");
+    }
+
     @PostMapping("/bucket-item/{id}/file")
     public ResponseEntity<?> uploadFile(@PathVariable Long id, @RequestParam("file") MultipartFile file){  
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

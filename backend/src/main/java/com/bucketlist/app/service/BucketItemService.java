@@ -2,9 +2,9 @@ package com.bucketlist.app.service;
 
 import com.bucketlist.app.dto.BucketItemRequest;
 import com.bucketlist.app.dto.BucketItemResponse;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface BucketItemService {
     // 버킷 리스트 항목 생성
@@ -23,5 +23,12 @@ public interface BucketItemService {
     // 버킷 항목 삭제
     void delete(Long id);
 
+    // 버킷 항목 완료 처리
+    void complete(Long id);
+
+    // 버킷 항목 미완료 처리
+    void uncomplete(Long id);
+
+    // 버킷 항목 파일 업로드
     String uploadFile(Long id, MultipartFile file, String email);
 }
