@@ -108,6 +108,24 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
+    public void complete(Long id){// 버킷 항목 완료 처리
+        BucketItem item = bucketItemRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
+        
+        item.setCompleted(true);
+        bucketItemRepository.save(item);
+    }
+
+    @Override
+    public void uncomplete(Long id){// 버킷 항목 미완료 처리
+        BucketItem item = bucketItemRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
+        
+        item.setCompleted(false);
+        bucketItemRepository.save(item);
+    }
+
+    @Override
     public String uploadFile(Long id, MultipartFile file, String email){// 버킷 항목 파일 업로드
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));

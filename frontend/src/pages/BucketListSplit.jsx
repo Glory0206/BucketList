@@ -19,6 +19,8 @@ function BucketListSplit() {
   const [editDueDate, setEditDueDate] = useState(null);
   const dateInputRef = useRef(null);
   const navigate = useNavigate();
+  const [selectedIncompleted, setSelectedIncompleted] = useState([]);
+  const [selectedUncomplete, setSelectedUncomplete] = useState([]);
     
   useEffect(() => {
     const fetchItems = async () => {
@@ -117,6 +119,55 @@ function BucketListSplit() {
     }
   };
 
+  // 미완료 체크박스 핸들러
+  const handleCheckIncompleted = (id) => {
+    setSelectedIncompleted(prev =>
+      prev.includes(id) ? prev.filter(_id => _id !== id) : [...prev, id]
+    );
+  };
+  // 완료 → 미완료 체크박스 핸들러
+  const handleCheckUncomplete = (id) => {
+    setSelectedUncomplete(prev =>
+      prev.includes(id) ? prev.filter(_id => _id !== id) : [...prev, id]
+    );
+  };
+
+  // 미완료 → 완료 일괄 처리
+  const handleCompleteSelected = async () => {
+    if (selectedIncompleted.length === 0) {
+      alert('완료할 항목을 선택하세요.');
+      return;
+    }
+    try {
+      await Promise.all(selectedIncompleted.map(id => api.put(`/bucket/${id}/complete`)));
+      const completed = incompletedItems.filter(item => selectedIncompleted.includes(item.id));
+      setIncompletedItems(incompletedItems.filter(item => !selectedIncompleted.includes(item.id)));
+      setCompletedItems([...completedItems, ...completed.map(item => ({ ...item, completed: true }))]);
+      setSelectedIncompleted([]);
+    } catch (error) {
+      const msg = error.response?.data?.message || '완료 처리 중 오류가 발생했습니다.';
+      alert(msg);
+    }
+  };
+
+  // 완료 → 미완료 일괄 처리
+  const handleUncompleteSelected = async () => {
+    if (selectedUncomplete.length === 0) {
+      alert('미완료로 변경할 항목을 선택하세요.');
+      return;
+    }
+    try {
+      await Promise.all(selectedUncomplete.map(id => api.put(`/bucket/${id}/uncomplete`)));
+      const uncompleted = completedItems.filter(item => selectedUncomplete.includes(item.id));
+      setCompletedItems(completedItems.filter(item => !selectedUncomplete.includes(item.id)));
+      setIncompletedItems([...incompletedItems, ...uncompleted.map(item => ({ ...item, completed: false }))]);
+      setSelectedUncomplete([]);
+    } catch (error) {
+      const msg = error.response?.data?.message || '미완료 처리 중 오류가 발생했습니다.';
+      alert(msg);
+    }
+  };
+  
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -135,7 +186,13 @@ function BucketListSplit() {
           <div className="row">
             {/* 미완료 리스트 (왼쪽) */}
             <div className="col-md-6 border-end">
-              <h4 className="text-success mb-3">미완료</h4>
+              <h4 className="text-success mb-3 d-flex align-items-center justify-content-between">
+                미완료
+                {/* 선택 항목 완료 버튼 */}
+                <button className="btn btn-outline-success btn-sm me-2" onClick={handleCompleteSelected} disabled={selectedIncompleted.length === 0}>
+                  선택 항목 완료로 변경
+                </button>
+              </h4>
               <div className="input-group mb-3">
                 <input
                   type="text"
@@ -179,102 +236,131 @@ function BucketListSplit() {
               <ul className="list-group">
                 {incompletedItems.map((item) => (
                   <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
-                    {editId === item.id ? (
-                      <div className="w-100 d-flex align-items-center">
-                        <input
-                          type="text"
-                          className="form-control me-2"
-                          value={editContent}
-                          onChange={e => setEditContent(e.target.value)}
-                          style={{ maxWidth: 200 }}
-                        />
-                        <ReactDatePicker
-                          selected={editDueDate}
-                          onChange={date => setEditDueDate(date)}
-                          dateFormat="yyyy-MM-dd"
-                          className="form-control me-2"
-                          minDate={new Date()}
-                          placeholderText="날짜 선택"
-                          style={{ maxWidth: 150 }}
-                        />
-                        <EditSaveCancelButtons
-                          onSave={() => handleSaveEdit(item.id, false)}
-                          onCancel={handleCancelEdit}
-                        />
-                      </div>
-                    ) : (
-                      <>
-                        <span>
-                          {item.content}
-                          {item.dueDate && (
-                            <span style={{ color: '#198754', fontSize: '0.9em', marginLeft: 8 }}>
-                              ({new Date(item.dueDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })})
-                            </span>
+                    <div className="d-flex align-items-center w-100">
+                      {/* 체크박스: 미완료 → 완료 */}
+                      <input
+                        type="checkbox"
+                        className="form-check-input me-2"
+                        checked={selectedIncompleted.includes(item.id)}
+                        onChange={() => handleCheckIncompleted(item.id)}
+                        disabled={editId === item.id}
+                        style={{ cursor: 'pointer' }}
+                        aria-label="완료 처리"
+                      />
+                      {editId === item.id ? (
+                        <>
+                          <input
+                            type="text"
+                            className="form-control me-2"
+                            value={editContent}
+                            onChange={e => setEditContent(e.target.value)}
+                            style={{ maxWidth: 200 }}
+                          />
+                          <ReactDatePicker
+                            selected={editDueDate}
+                            onChange={date => setEditDueDate(date)}
+                            dateFormat="yyyy-MM-dd"
+                            className="form-control me-2"
+                            minDate={new Date()}
+                            placeholderText="날짜 선택"
+                            style={{ maxWidth: 150 }}
+                          />
+                          <EditSaveCancelButtons
+                            onSave={() => handleSaveEdit(item.id, false)}
+                            onCancel={handleCancelEdit}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <span>
+                            {item.content}
+                            {item.dueDate && (
+                              <span style={{ color: '#198754', fontSize: '0.9em', marginLeft: 8 }}>
+                                ({new Date(item.dueDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })})
+                              </span>
+                            )}
+                          </span>
+                          {editMode && (
+                            <div>
+                              <EditActionButtons
+                                onEdit={() => handleEdit(item)}
+                                onDelete={() => handleDelete(item.id, false)}
+                              />
+                            </div>
                           )}
-                        </span>
-                        {editMode && (
-                          <div>
-                            <EditActionButtons
-                              onEdit={() => handleEdit(item)}
-                              onDelete={() => handleDelete(item.id, false)}
-                            />
-                          </div>
-                        )}
-                      </>
-                    )}
+                        </>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
             </div>
             {/* 완료 리스트 (오른쪽) */}
             <div className="col-md-6">
-              <h4 className="text-secondary mb-3">완료</h4>
+              <h4 className="text-secondary mb-3 d-flex align-items-center justify-content-between">
+                완료
+                <button className="btn btn-outline-danger btn-sm me-2" onClick={handleUncompleteSelected} disabled={selectedUncomplete.length === 0}>
+                  선택 항목 미완료로 변경
+                </button>
+              </h4>
               <ul className="list-group">
                 {completedItems.map((item) => (
                   <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
-                    {editId === item.id ? (
-                      <div className="w-100 d-flex align-items-center">
-                        <input
-                          type="text"
-                          className="form-control me-2"
-                          value={editContent}
-                          onChange={e => setEditContent(e.target.value)}
-                          style={{ maxWidth: 200 }}
-                        />
-                        <ReactDatePicker
-                          selected={editDueDate}
-                          onChange={date => setEditDueDate(date)}
-                          dateFormat="yyyy-MM-dd"
-                          className="form-control me-2"
-                          minDate={new Date()}
-                          placeholderText="날짜 선택"
-                          style={{ maxWidth: 150 }}
-                        />
-                        <EditSaveCancelButtons
-                          onSave={() => handleSaveEdit(item.id, true)}
-                          onCancel={handleCancelEdit}
-                        />
-                      </div>
-                    ) : (
-                      <>
-                        <span>
-                          {item.content}
-                          {item.dueDate && (
-                            <span style={{ color: '#198754', fontSize: '0.9em', marginLeft: 8 }}>
-                              ({new Date(item.dueDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })})
-                            </span>
+                    <div className="d-flex align-items-center w-100">
+                      {/* 체크박스: 완료 → 미완료 */}
+                      <input
+                        type="checkbox"
+                        className="form-check-input me-2"
+                        checked={selectedUncomplete.includes(item.id)}
+                        onChange={() => handleCheckUncomplete(item.id)}
+                        disabled={editId === item.id}
+                        style={{ cursor: 'pointer' }}
+                        aria-label="미완료 처리"
+                      />
+                      {editId === item.id ? (
+                        <>
+                          <input
+                            type="text"
+                            className="form-control me-2"
+                            value={editContent}
+                            onChange={e => setEditContent(e.target.value)}
+                            style={{ maxWidth: 200 }}
+                          />
+                          <ReactDatePicker
+                            selected={editDueDate}
+                            onChange={date => setEditDueDate(date)}
+                            dateFormat="yyyy-MM-dd"
+                            className="form-control me-2"
+                            minDate={new Date()}
+                            placeholderText="날짜 선택"
+                            style={{ maxWidth: 150 }}
+                          />
+                          <EditSaveCancelButtons
+                            onSave={() => handleSaveEdit(item.id, true)}
+                            onCancel={handleCancelEdit}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <span>
+                            {item.content}
+                            {item.dueDate && (
+                              <span style={{ color: '#198754', fontSize: '0.9em', marginLeft: 8 }}>
+                                ({new Date(item.dueDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })})
+                              </span>
+                            )}
+                          </span>
+                          {editMode && (
+                            <div>
+                              <EditActionButtons
+                                onEdit={() => handleEdit(item)}
+                                onDelete={() => handleDelete(item.id, true)}
+                              />
+                            </div>
                           )}
-                        </span>
-                        {editMode && (
-                          <div>
-                            <EditActionButtons
-                              onEdit={() => handleEdit(item)}
-                              onDelete={() => handleDelete(item.id, true)}
-                            />
-                          </div>
-                        )}
-                      </>
-                    )}
+                        </>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
