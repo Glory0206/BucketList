@@ -1,11 +1,11 @@
 package com.bucketlist.app.service;
 
-import com.bucketlist.app.dto.CodeVerifyRequest;
+import com.bucketlist.app.dto.ResetPasswordRequest;
 
 public interface ResetPasswordService {
     String createRandomCode();
 
     void sendCode(String email);
 
-    boolean resetPassword(CodeVerifyRequest request);
+    boolean resetPassword(ResetPasswordRequest request);
 }
