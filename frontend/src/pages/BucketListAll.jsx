@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import EditModeToggle from "../components/EditModeToggle";
 import EditSaveCancelButtons from "../components/EditSaveCancelButtons";
 import EditActionButtons from "../components/EditActionButtons";
+import ItemDetailModal from "../components/ItemDetailModal";
 
 function BucketListAll() {
   const [items, setItems] = useState([]);
@@ -16,6 +17,8 @@ function BucketListAll() {
   const [editId, setEditId] = useState(null);
   const [editContent, setEditContent] = useState('');
   const [editDueDate, setEditDueDate] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   const dateInputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -97,6 +100,18 @@ function BucketListAll() {
       const msg = error.response?.data?.message || '수정 중 오류가 발생했습니다.';
       alert(msg);
     }
+  };
+
+  // 모달 열기
+  const handleOpenModal = (item) => {
+    setSelectedItem(item);
+    setModalOpen(true);
+  };
+
+  // 모달 닫기
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedItem(null);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -187,7 +202,11 @@ function BucketListAll() {
                     </div>
                   ) : (
                     <>
-                      <span>
+                      <span 
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => handleOpenModal(item)}
+                        title="클릭하여 상세보기"
+                      >
                         {item.content}
                         {item.dueDate && (
                           <span style={{ color: '#198754', fontSize: '0.9em', marginLeft: 8 }}>
@@ -211,6 +230,13 @@ function BucketListAll() {
           )}
         </div>
       </div>
+      
+      {/* 모달 컴포넌트 */}
+      <ItemDetailModal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        item={selectedItem}
+      />
     </div>
   );
 }
