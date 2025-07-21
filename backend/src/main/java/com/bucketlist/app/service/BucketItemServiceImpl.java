@@ -187,6 +187,7 @@ public class BucketItemServiceImpl implements BucketItemService{
         }
 
         String filePath = uploadDir + "/" + fileName;
+        String fileUrl = "/uploads/" + fileName;
         File dest = new File(filePath);
 
         try{
@@ -197,12 +198,12 @@ public class BucketItemServiceImpl implements BucketItemService{
 
         FileUpload fileUpload = new FileUpload();
         fileUpload.setFileName(fileName);
-        fileUpload.setFileUrl(filePath);
+        fileUpload.setFileUrl(fileUrl); // <-- HTTP 접근 경로로 저장
         fileUpload.setBucketItem(item);
 
         fileUploadRepository.save(fileUpload);
 
-        return filePath;
+        return fileUrl;
     }
 
     @Override

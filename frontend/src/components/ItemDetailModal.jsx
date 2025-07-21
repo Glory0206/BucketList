@@ -134,7 +134,7 @@ function ItemDetailModal({ isOpen, onClose, item, refreshItem }) {
                 {item.files && item.files.length > 0 ? (
                   item.files.map((file) => (
                     <li key={file.id} className="list-group-item d-flex justify-content-between align-items-center">
-                      <a href={file.fileUrl} target="_blank" rel="noopener noreferrer">{file.fileName}</a>
+                      <a href={`/uploads/${file.fileName}`} target="_blank" rel="noopener noreferrer">{file.fileName}</a>
                       <button
                         className="btn btn-sm btn-danger"
                         onClick={() => handleFileDelete(file.id)}
