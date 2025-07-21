@@ -189,6 +189,19 @@ function BucketListSplit() {
     setModalOpen(true);
   };
 
+  // 모달에서 사용할 최신 아이템 갱신 함수
+  const refreshAndSelect = async (id) => {
+    const [incompletedRes, completedRes] = await Promise.all([
+      api.get('/bucket/incompleted'),
+      api.get('/bucket/completed')
+    ]);
+    setIncompletedItems(incompletedRes.data);
+    setCompletedItems(completedRes.data);
+    // 미완료/완료 리스트에서 해당 아이템 찾기
+    const updated = incompletedRes.data.find(i => i.id === id) || completedRes.data.find(i => i.id === id);
+    setSelectedItem(updated);
+  };
+
   // 모달 닫기
   const handleCloseModal = () => {
     setModalOpen(false);
@@ -409,6 +422,7 @@ function BucketListSplit() {
         isOpen={modalOpen}
         onClose={handleCloseModal}
         item={selectedItem}
+        refreshItem={() => refreshAndSelect(selectedItem.id)}
       />
     </div>
   );

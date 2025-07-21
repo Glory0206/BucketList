@@ -5,6 +5,7 @@ import com.bucketlist.app.domain.FileUpload;
 import com.bucketlist.app.domain.User;
 import com.bucketlist.app.dto.BucketItemRequest;
 import com.bucketlist.app.dto.BucketItemResponse;
+import com.bucketlist.app.dto.FileUploadResponse;
 import com.bucketlist.app.repository.BucketItemRepository;
 import com.bucketlist.app.repository.FileUploadRepository;
 import com.bucketlist.app.repository.UserRepository;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,7 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .dueDate(request.getDueDate())
                 .user(user)
                 .createdAt(LocalDateTime.now())
+                .files(new ArrayList<>())
                 .build();
 
         bucketItemRepository.save(item);
@@ -48,6 +51,13 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .dueDate(item.getDueDate())
                 .createdAt(item.getCreatedAt())
                 .completedAt(item.getCompletedAt())
+                .files(item.getFiles().stream()
+                        .map(file -> FileUploadResponse.builder()
+                                .id(file.getId())
+                                .fileName(file.getFileName())
+                                .fileUrl(file.getFileUrl())
+                                .build())
+                        .toList())
                 .build();
     }
 
@@ -64,6 +74,13 @@ public class BucketItemServiceImpl implements BucketItemService{
                         .dueDate(item.getDueDate())
                         .createdAt(item.getCreatedAt())
                         .completedAt(item.getCompletedAt())
+                        .files(item.getFiles().stream()
+                                .map(file -> FileUploadResponse.builder()
+                                        .id(file.getId())
+                                        .fileName(file.getFileName())
+                                        .fileUrl(file.getFileUrl())
+                                        .build())
+                                .toList())
                         .build())
                 .toList();
     }
@@ -81,6 +98,13 @@ public class BucketItemServiceImpl implements BucketItemService{
                         .dueDate(item.getDueDate())
                         .createdAt(item.getCreatedAt())
                         .completedAt(item.getCompletedAt())
+                        .files(item.getFiles().stream()
+                                .map(file -> FileUploadResponse.builder()
+                                        .id(file.getId())
+                                        .fileName(file.getFileName())
+                                        .fileUrl(file.getFileUrl())
+                                        .build())
+                                .toList())
                         .build())
                 .toList();
     }
@@ -98,6 +122,13 @@ public class BucketItemServiceImpl implements BucketItemService{
                         .dueDate(item.getDueDate())
                         .createdAt(item.getCreatedAt())
                         .completedAt(item.getCompletedAt())
+                        .files(item.getFiles().stream()
+                                .map(file -> FileUploadResponse.builder()
+                                        .id(file.getId())
+                                        .fileName(file.getFileName())
+                                        .fileUrl(file.getFileUrl())
+                                        .build())
+                                .toList())
                         .build())
                 .toList();
     }
@@ -108,7 +139,7 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
 
         item.setContent(request.getContent());
-        item.setDueDate(request.getDueDate());
+        item.setDueDate(request.getDueDate()); 
         bucketItemRepository.save(item);
     }
     
