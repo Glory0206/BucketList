@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import EditModeToggle from "../components/EditModeToggle";
 import EditSaveCancelButtons from "../components/EditSaveCancelButtons";
 import EditActionButtons from "../components/EditActionButtons";
+import ItemDetailModal from "../components/ItemDetailModal";
 
 function BucketListSplit() {
   const [incompletedItems, setIncompletedItems] = useState([]);
@@ -17,6 +18,8 @@ function BucketListSplit() {
   const [editId, setEditId] = useState(null);
   const [editContent, setEditContent] = useState('');
   const [editDueDate, setEditDueDate] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   const dateInputRef = useRef(null);
   const navigate = useNavigate();
   const [selectedIncompleted, setSelectedIncompleted] = useState([]);
@@ -140,9 +143,15 @@ function BucketListSplit() {
     }
     try {
       await Promise.all(selectedIncompleted.map(id => api.put(`/bucket/${id}/complete`)));
-      const completed = incompletedItems.filter(item => selectedIncompleted.includes(item.id));
-      setIncompletedItems(incompletedItems.filter(item => !selectedIncompleted.includes(item.id)));
-      setCompletedItems([...completedItems, ...completed.map(item => ({ ...item, completed: true }))]);
+      
+      // 완료 처리 후 서버에서 최신 데이터를 다시 가져옴
+      const [incompletedRes, completedRes] = await Promise.all([
+        api.get('/bucket/incompleted'),
+        api.get('/bucket/completed')
+      ]);
+      
+      setIncompletedItems(incompletedRes.data);
+      setCompletedItems(completedRes.data);
       setSelectedIncompleted([]);
     } catch (error) {
       const msg = error.response?.data?.message || '완료 처리 중 오류가 발생했습니다.';
@@ -158,14 +167,32 @@ function BucketListSplit() {
     }
     try {
       await Promise.all(selectedUncomplete.map(id => api.put(`/bucket/${id}/uncomplete`)));
-      const uncompleted = completedItems.filter(item => selectedUncomplete.includes(item.id));
-      setCompletedItems(completedItems.filter(item => !selectedUncomplete.includes(item.id)));
-      setIncompletedItems([...incompletedItems, ...uncompleted.map(item => ({ ...item, completed: false }))]);
+      
+      // 미완료 처리 후 서버에서 최신 데이터를 다시 가져옴
+      const [incompletedRes, completedRes] = await Promise.all([
+        api.get('/bucket/incompleted'),
+        api.get('/bucket/completed')
+      ]);
+      
+      setIncompletedItems(incompletedRes.data);
+      setCompletedItems(completedRes.data);
       setSelectedUncomplete([]);
     } catch (error) {
       const msg = error.response?.data?.message || '미완료 처리 중 오류가 발생했습니다.';
       alert(msg);
     }
+  };
+
+  // 모달 열기
+  const handleOpenModal = (item) => {
+    setSelectedItem(item);
+    setModalOpen(true);
+  };
+
+  // 모달 닫기
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedItem(null);
   };
   
   if (loading) return <p>Loading...</p>;
@@ -272,7 +299,11 @@ function BucketListSplit() {
                         </>
                       ) : (
                         <>
-                          <span>
+                          <span 
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => handleOpenModal(item)}
+                            title="클릭하여 상세보기"
+                          >
                             {item.content}
                             {item.dueDate && (
                               <span style={{ color: '#198754', fontSize: '0.9em', marginLeft: 8 }}>
@@ -342,7 +373,11 @@ function BucketListSplit() {
                         </>
                       ) : (
                         <>
-                          <span>
+                          <span 
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => handleOpenModal(item)}
+                            title="클릭하여 상세보기"
+                          >
                             {item.content}
                             {item.dueDate && (
                               <span style={{ color: '#198754', fontSize: '0.9em', marginLeft: 8 }}>
@@ -368,6 +403,13 @@ function BucketListSplit() {
           </div>
         </div>
       </div>
+      
+      {/* 모달 컴포넌트 */}
+      <ItemDetailModal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        item={selectedItem}
+      />
     </div>
   );
 }
