@@ -33,5 +33,5 @@ public interface BucketItemService {
     String uploadFile(Long id, MultipartFile file, String email);
 
     // 버킷 항목 파일 삭제
-    void deleteFile(Long id, String email);
+    void deleteFile(Long id, Long fileId, String email);
 }

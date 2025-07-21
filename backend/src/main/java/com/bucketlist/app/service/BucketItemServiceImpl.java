@@ -206,14 +206,17 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
-    public void deleteFile(Long id, String email){// 버킷 항목 파일 삭제
+    public void deleteFile(Long id, Long fileId, String email){// 버킷 항목 파일 삭제
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
         
         BucketItem item = bucketItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
 
-        String filePath = fileUploadRepository.findByBucketItemId(id).get(0).getFileUrl();
+        FileUpload fileUpload = fileUploadRepository.findById(fileId)
+                .orElseThrow(() -> new IllegalArgumentException("파일 없음"));
+
+        String filePath = fileUpload.getFileUrl();
         if(filePath != null){
             File file = new File(filePath);
             if(file.exists()){
@@ -221,6 +224,6 @@ public class BucketItemServiceImpl implements BucketItemService{
             }
         }
 
-        fileUploadRepository.deleteByBucketItemId(id);
+        fileUploadRepository.delete(fileUpload);
     }
 }

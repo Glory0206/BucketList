@@ -29,11 +29,11 @@ function ItemDetailModal({ isOpen, onClose, item, refreshItem }) {
   };
 
   // 파일 삭제
-  const handleFileDelete = async () => {
+  const handleFileDelete = async (fileId) => {
     if (!window.confirm('정말 파일을 삭제하시겠습니까?')) return;
     setDeleting(true);
     try {
-      await api.delete(`/bucket/bucket-item/${item.id}/file`);
+      await api.delete(`/bucket/bucket-item/${item.id}/file/${fileId}`);
       if (refreshItem) refreshItem();
     } catch (err) {
       alert('파일 삭제에 실패했습니다.');
@@ -137,7 +137,7 @@ function ItemDetailModal({ isOpen, onClose, item, refreshItem }) {
                       <a href={file.fileUrl} target="_blank" rel="noopener noreferrer">{file.fileName}</a>
                       <button
                         className="btn btn-sm btn-danger"
-                        onClick={handleFileDelete}
+                        onClick={() => handleFileDelete(file.id)}
                         disabled={deleting}
                       >
                         {deleting ? '삭제 중...' : '삭제'}
