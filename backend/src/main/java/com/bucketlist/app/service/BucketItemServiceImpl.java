@@ -217,7 +217,7 @@ public class BucketItemServiceImpl implements BucketItemService{
         FileUpload fileUpload = fileUploadRepository.findById(fileId)
                 .orElseThrow(() -> new IllegalArgumentException("파일 없음"));
 
-        String filePath = fileUpload.getFileUrl();
+        String filePath = System.getProperty("user.dir") + "/../uploads/" + fileUpload.getFileName();
         if(filePath != null){
             File file = new File(filePath);
             if(file.exists()){
