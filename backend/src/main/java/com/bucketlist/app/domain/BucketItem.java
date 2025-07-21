@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,4 +35,15 @@ public class BucketItem {
 
     @OneToMany(mappedBy = "bucketItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileUpload> files = new ArrayList<>();
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = true)
+    private LocalDateTime completedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }

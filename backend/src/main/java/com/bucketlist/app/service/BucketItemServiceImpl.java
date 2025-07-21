@@ -16,6 +16,7 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .completed(false)
                 .dueDate(request.getDueDate())
                 .user(user)
+                .createdAt(LocalDateTime.now())
                 .build();
 
         bucketItemRepository.save(item);
@@ -44,6 +46,8 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .content(item.getContent())
                 .completed(item.isCompleted())
                 .dueDate(item.getDueDate())
+                .createdAt(item.getCreatedAt())
+                .completedAt(item.getCompletedAt())
                 .build();
     }
 
@@ -58,6 +62,8 @@ public class BucketItemServiceImpl implements BucketItemService{
                         .content(item.getContent())
                         .completed(item.isCompleted())
                         .dueDate(item.getDueDate())
+                        .createdAt(item.getCreatedAt())
+                        .completedAt(item.getCompletedAt())
                         .build())
                 .toList();
     }
@@ -73,6 +79,8 @@ public class BucketItemServiceImpl implements BucketItemService{
                         .content(item.getContent())
                         .completed(item.isCompleted())
                         .dueDate(item.getDueDate())
+                        .createdAt(item.getCreatedAt())
+                        .completedAt(item.getCompletedAt())
                         .build())
                 .toList();
     }
@@ -88,6 +96,8 @@ public class BucketItemServiceImpl implements BucketItemService{
                         .content(item.getContent())
                         .completed(item.isCompleted())
                         .dueDate(item.getDueDate())
+                        .createdAt(item.getCreatedAt())
+                        .completedAt(item.getCompletedAt())
                         .build())
                 .toList();
     }
@@ -113,6 +123,7 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
         
         item.setCompleted(true);
+        item.setCompletedAt(LocalDateTime.now());
         bucketItemRepository.save(item);
     }
 
@@ -122,6 +133,7 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
         
         item.setCompleted(false);
+        item.setCompletedAt(null);
         bucketItemRepository.save(item);
     }
 
