@@ -26,7 +26,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     private final UserRepository userRepository;
     private final BucketItemRepository bucketItemRepository;
     private final FileUploadRepository fileUploadRepository;
-    private final String uploadDir = System.getProperty("user.dir") + "/uploads";
+    private final String uploadDir = System.getProperty("user.dir") + "/../uploads";
 
     @Override
     public BucketItemResponse create(String email, BucketItemRequest request){// 버킷 리스트 항목 생성
