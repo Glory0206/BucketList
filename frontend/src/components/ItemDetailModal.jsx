@@ -1,17 +1,49 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import api from '../services/api';
 
-function ItemDetailModal({ isOpen, onClose, item }) {
+function ItemDetailModal({ isOpen, onClose, item, refreshItem }) {
   if (!isOpen || !item) return null;
 
-  // 디버깅 콘솔 출력
-  console.log('Modal item data:', item);
+  const fileInputRef = useRef();
+  const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(null);
+
+  // 파일 업로드
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      await api.post(`/bucket/bucket-item/${item.id}/file`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (refreshItem) refreshItem();
+    } catch (err) {
+      alert('파일 업로드 실패');
+    } finally {
+      setUploading(false);
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // 파일 삭제
+  const handleFileDelete = async (fileId) => {
+    if (!window.confirm('정말 파일을 삭제하시겠습니까?')) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/bucket/bucket-item/${item.id}/file/${fileId}`);
+      if (refreshItem) refreshItem();
+    } catch (err) {
+      alert('파일 삭제에 실패했습니다.');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
-    <div 
-      className="modal fade show" 
-      style={{ display: 'block' }} 
-      tabIndex="-1"
-    >
+    <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header bg-success text-white">
@@ -28,7 +60,6 @@ function ItemDetailModal({ isOpen, onClose, item }) {
               <h6 className="text-success">내용</h6>
               <p className="mb-0">{item.content}</p>
             </div>
-            
             <div className="mb-3">
               <h6 className="text-success">완료 희망일</h6>
               <p className="mb-0">
@@ -43,7 +74,6 @@ function ItemDetailModal({ isOpen, onClose, item }) {
                 }
               </p>
             </div>
-            
             <div className="mb-3">
               <h6 className="text-success">상태</h6>
               <p className="mb-0">
@@ -54,7 +84,6 @@ function ItemDetailModal({ isOpen, onClose, item }) {
                 )}
               </p>
             </div>
-            
             <div className="mb-3">
               <h6 className="text-success">생성일</h6>
               <p className="mb-0">
@@ -70,7 +99,6 @@ function ItemDetailModal({ isOpen, onClose, item }) {
                 }
               </p>
             </div>
-            
             {item.completedAt && (
               <div className="mb-3">
                 <h6 className="text-success">완료일</h6>
@@ -85,14 +113,42 @@ function ItemDetailModal({ isOpen, onClose, item }) {
                 </p>
               </div>
             )}
-            
-            {/* 완료된 항목이지만 완료일이 없는 경우 */}
             {item.completed && !item.completedAt && (
               <div className="mb-3">
                 <h6 className="text-success">완료일</h6>
                 <p className="mb-0 text-danger">완료된 항목이지만 완료일 정보가 없습니다</p>
               </div>
             )}
+            {/* 파일 업로드/리스트 영역 */}
+            <div className="mb-3">
+              <h6 className="text-success">첨부파일</h6>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                disabled={uploading}
+                className="form-control mb-2"
+              />
+              {uploading && <div className="text-info">업로드 중...</div>}
+              <ul className="list-group">
+                {item.files && item.files.length > 0 ? (
+                  item.files.map((file) => (
+                    <li key={file.id} className="list-group-item d-flex justify-content-between align-items-center">
+                      <a href={`/uploads/${file.fileName}`} target="_blank" rel="noopener noreferrer">{file.fileName}</a>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleFileDelete(file.id)}
+                        disabled={deleting}
+                      >
+                        {deleting ? '삭제 중...' : '삭제'}
+                      </button>
+                    </li>
+                  ))
+                ) : (
+                  <li className="list-group-item text-muted">첨부파일 없음</li>
+                )}
+              </ul>
+            </div>
           </div>
           <div className="modal-footer">
             <button

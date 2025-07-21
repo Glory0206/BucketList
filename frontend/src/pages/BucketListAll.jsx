@@ -108,6 +108,14 @@ function BucketListAll() {
     setModalOpen(true);
   };
 
+  // 모달에서 사용할 최신 아이템 갱신 함수
+  const refreshAndSelect = async (id) => {
+    const res = await api.get('/bucket');
+    setItems(res.data);
+    const updated = res.data.find(i => i.id === id);
+    setSelectedItem(updated);
+  };
+
   // 모달 닫기
   const handleCloseModal = () => {
     setModalOpen(false);
@@ -236,6 +244,7 @@ function BucketListAll() {
         isOpen={modalOpen}
         onClose={handleCloseModal}
         item={selectedItem}
+        refreshItem={() => refreshAndSelect(selectedItem.id)}
       />
     </div>
   );

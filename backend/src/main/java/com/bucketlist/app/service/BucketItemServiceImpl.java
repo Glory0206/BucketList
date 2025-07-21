@@ -5,6 +5,7 @@ import com.bucketlist.app.domain.FileUpload;
 import com.bucketlist.app.domain.User;
 import com.bucketlist.app.dto.BucketItemRequest;
 import com.bucketlist.app.dto.BucketItemResponse;
+import com.bucketlist.app.dto.FileUploadResponse;
 import com.bucketlist.app.repository.BucketItemRepository;
 import com.bucketlist.app.repository.FileUploadRepository;
 import com.bucketlist.app.repository.UserRepository;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     private final UserRepository userRepository;
     private final BucketItemRepository bucketItemRepository;
     private final FileUploadRepository fileUploadRepository;
-    private final String uploadDir = System.getProperty("user.dir") + "/uploads";
+    private final String uploadDir = System.getProperty("user.dir") + "/../uploads";
 
     @Override
     public BucketItemResponse create(String email, BucketItemRequest request){// 버킷 리스트 항목 생성
@@ -37,6 +39,7 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .dueDate(request.getDueDate())
                 .user(user)
                 .createdAt(LocalDateTime.now())
+                .files(new ArrayList<>())
                 .build();
 
         bucketItemRepository.save(item);
@@ -48,6 +51,13 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .dueDate(item.getDueDate())
                 .createdAt(item.getCreatedAt())
                 .completedAt(item.getCompletedAt())
+                .files(item.getFiles().stream()
+                        .map(file -> FileUploadResponse.builder()
+                                .id(file.getId())
+                                .fileName(file.getFileName())
+                                .fileUrl(file.getFileUrl())
+                                .build())
+                        .toList())
                 .build();
     }
 
@@ -64,6 +74,13 @@ public class BucketItemServiceImpl implements BucketItemService{
                         .dueDate(item.getDueDate())
                         .createdAt(item.getCreatedAt())
                         .completedAt(item.getCompletedAt())
+                        .files(item.getFiles().stream()
+                                .map(file -> FileUploadResponse.builder()
+                                        .id(file.getId())
+                                        .fileName(file.getFileName())
+                                        .fileUrl(file.getFileUrl())
+                                        .build())
+                                .toList())
                         .build())
                 .toList();
     }
@@ -81,6 +98,13 @@ public class BucketItemServiceImpl implements BucketItemService{
                         .dueDate(item.getDueDate())
                         .createdAt(item.getCreatedAt())
                         .completedAt(item.getCompletedAt())
+                        .files(item.getFiles().stream()
+                                .map(file -> FileUploadResponse.builder()
+                                        .id(file.getId())
+                                        .fileName(file.getFileName())
+                                        .fileUrl(file.getFileUrl())
+                                        .build())
+                                .toList())
                         .build())
                 .toList();
     }
@@ -98,6 +122,13 @@ public class BucketItemServiceImpl implements BucketItemService{
                         .dueDate(item.getDueDate())
                         .createdAt(item.getCreatedAt())
                         .completedAt(item.getCompletedAt())
+                        .files(item.getFiles().stream()
+                                .map(file -> FileUploadResponse.builder()
+                                        .id(file.getId())
+                                        .fileName(file.getFileName())
+                                        .fileUrl(file.getFileUrl())
+                                        .build())
+                                .toList())
                         .build())
                 .toList();
     }
@@ -108,7 +139,7 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
 
         item.setContent(request.getContent());
-        item.setDueDate(request.getDueDate());
+        item.setDueDate(request.getDueDate()); 
         bucketItemRepository.save(item);
     }
     
@@ -156,6 +187,7 @@ public class BucketItemServiceImpl implements BucketItemService{
         }
 
         String filePath = uploadDir + "/" + fileName;
+        String fileUrl = "/uploads/" + fileName;
         File dest = new File(filePath);
 
         try{
@@ -166,11 +198,33 @@ public class BucketItemServiceImpl implements BucketItemService{
 
         FileUpload fileUpload = new FileUpload();
         fileUpload.setFileName(fileName);
-        fileUpload.setFileUrl(filePath);
+        fileUpload.setFileUrl(fileUrl); // <-- HTTP 접근 경로로 저장
         fileUpload.setBucketItem(item);
 
         fileUploadRepository.save(fileUpload);
 
-        return filePath;
+        return fileUrl;
+    }
+
+    @Override
+    public void deleteFile(Long id, Long fileId, String email){// 버킷 항목 파일 삭제
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+        
+        BucketItem item = bucketItemRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
+
+        FileUpload fileUpload = fileUploadRepository.findById(fileId)
+                .orElseThrow(() -> new IllegalArgumentException("파일 없음"));
+
+        String filePath = System.getProperty("user.dir") + "/../uploads/" + fileUpload.getFileName();
+        if(filePath != null){
+            File file = new File(filePath);
+            if(file.exists()){
+                file.delete();
+            }
+        }
+
+        fileUploadRepository.delete(fileUpload);
     }
 }
