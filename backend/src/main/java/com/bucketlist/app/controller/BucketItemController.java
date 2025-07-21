@@ -70,4 +70,11 @@ public class BucketItemController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(bucketItemService.uploadFile(id, file, email));
     }
+
+    @DeleteMapping("/bucket-item/{id}/file")
+    public ResponseEntity<?> deleteFile(@PathVariable Long id){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        bucketItemService.deleteFile(id, email);
+        return ResponseEntity.ok("파일 삭제 완료");
+    }
 }

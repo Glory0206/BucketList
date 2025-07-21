@@ -173,4 +173,23 @@ public class BucketItemServiceImpl implements BucketItemService{
 
         return filePath;
     }
+
+    @Override
+    public void deleteFile(Long id, String email){// 버킷 항목 파일 삭제
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+        
+        BucketItem item = bucketItemRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
+
+        String filePath = fileUploadRepository.findByBucketItemId(id).get(0).getFileUrl();
+        if(filePath != null){
+            File file = new File(filePath);
+            if(file.exists()){
+                file.delete();
+            }
+        }
+
+        fileUploadRepository.deleteByBucketItemId(id);
+    }
 }

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface FileUploadRepository extends JpaRepository<FileUpload, Long>{
     List<FileUpload> findByBucketItemId(Long bucketItemId);
+    void deleteByBucketItemId(Long bucketItemId);
 }
