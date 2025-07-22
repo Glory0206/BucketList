@@ -163,16 +163,49 @@ npm run dev
 spring:
   application:
     name: bucketlist
-  
+
   datasource:
     url: jdbc:postgresql://localhost:5432/bucketlist
     username: postgres
     password: your_password
-  
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  output:
+    ansi:
+      enabled: always
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  
+  web:
+    resources:
+      static-locations: file:./uploads/
+
+  # SMTP
+  mail:
+    host: smtp.naver.com
+    port: 587
+    username: your_naver_email
+    password: your_password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.naver.com
+    default-encoding: UTF-8
 ```
 
 ---
