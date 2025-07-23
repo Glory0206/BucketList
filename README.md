@@ -104,108 +104,47 @@ BucketList/
 
 ---
 
-## 🚀 설치 및 실행
+## 🛠 실행 방법
 
-### 사전 요구사항
+### 1. Docker Compose로 실행 (추천)
 
-- **Java 17** 이상
-- **Node.js 18** 이상
-- **PostgreSQL 13** 이상
-- **npm 8** 이상
-
-### 1. 프로젝트 클론
-
+#### 1) 저장소 클론
 ```bash
 git clone https://github.com/Glory0206/BucketList.git
 cd BucketList
 ```
 
-### 2. 데이터베이스 설정
-
-PostgreSQL에서 데이터베이스를 생성하고 연결 정보를 설정합니다.
-
-```sql
-CREATE DATABASE bucketlist;
+#### 2) 도커 컴포즈로 전체 서비스 실행
+```bash
+docker-compose up --build
 ```
 
-### 3. 백엔드 실행
+#### 3) 브라우저에서 접속
+- **프론트엔드**: [http://localhost:5173](http://localhost:5173)
 
+---
+
+### 2. 로컬 환경에서 직접 실행
+
+#### 1) 사전 요구사항
+- Java 17 이상
+- Node.js 20 이상
+- PostgreSQL 13 이상
+- npm 8 이상
+
+#### 2) 백엔드(Spring Boot)
 ```bash
 cd backend
-
-# Gradle을 사용한 빌드
 ./gradlew build
-
-# 애플리케이션 실행
 java -jar build/libs/bucketlist-0.0.1-SNAPSHOT.jar
 ```
+또는 IDE에서 `BucketlistApplication.java`의 main() 실행
 
-**또는 IDE에서 직접 실행:**
-- `BucketlistApplication.java`의 `main()` 메서드 실행
-
-### 4. 프론트엔드 실행
-
+#### 3) 프론트엔드(React)
 ```bash
 cd frontend
-
-# 의존성 설치
 npm install
-
-# 개발 서버 실행
 npm run dev
-```
-
-### 5. 환경 설정
-
-백엔드 `application.yml` 파일을 생성하고 다음 설정을 추가:
-
-```yaml
-spring:
-  application:
-    name: bucketlist
-
-  datasource:
-    url: jdbc:postgresql://localhost:5432/bucketlist
-    username: postgres
-    password: your_password
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-  output:
-    ansi:
-      enabled: always
-
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-  
-  web:
-    resources:
-      static-locations: file:./uploads/
-
-  # SMTP
-  mail:
-    host: smtp.naver.com
-    port: 587
-    username: your_naver_email
-    password: your_password
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-          ssl:
-            trust: smtp.naver.com
-    default-encoding: UTF-8
 ```
 
 ---
