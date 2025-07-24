@@ -44,8 +44,8 @@ public class JwtTokenProvider {
     // 토큰 유효 확인
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build()
-                    .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(key).build()//토큰 검증
+                    .parseClaimsJws(token);//토큰 파싱
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
