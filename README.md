@@ -46,6 +46,10 @@ BucketList는 사용자가 개인적인 버킷리스트를 생성하고 관리�
 - 전체 목록 및 분류별 조회
 - 파일 업로드 기능
 
+### ⚙️ 시스템 및 인프라
+- Spring AOP 기반 API 실행 시간 로깅  
+- Global Exception Handling을 통한 일관된 예외 응답
+
 ### 🎨 사용자 인터페이스
 - 반응형 웹 디자인
 - 직관적인 CRUD 작업
@@ -69,6 +73,8 @@ BucketList는 사용자가 개인적인 버킷리스트를 생성하고 관리�
 - **PostgreSQL** - 관계형 데이터베이스
 - **JWT (jjwt 0.11.5)** - 토큰 기반 인증
 - **Spring Mail** - 이메일 서비스
+- **Spring AOP** - API 실행 시간 로깅
+- **Global Exception Handling** - 일관된 예외 응답
 
 ### Development Tools
 - **Java 17** - 백엔드 개발 언어
@@ -91,13 +97,15 @@ BucketList/
 ├── backend/                  # Spring Boot 백엔드
 │   ├── src/main/java/
 │   │   └── com/bucketlist/app/
+│   │       ├── aop/         # AOP(관점 지향 프로그래밍) 설정 및 로깅
 │   │       ├── controller/  # REST API 컨트롤러
-│   │       ├── service/     # 비즈니스 로직
-│   │       ├── repository/  # 데이터 접근 계층
-│   │       ├── domain/      # 엔티티 클래스
-│   │       ├── dto/         # 데이터 전송 객체
-│   │       ├── security/    # JWT 보안 설정
-│   │       └── config/      # 애플리케이션 설정
+│   │       ├── service/     # 비즈니스 로직 처리
+│   │       ├── repository/  # 데이터베이스 접근 계층(JPA 등)
+│   │       ├── domain/      # 엔티티 클래스(데이터베이스 테이블 매핑)
+│   │       ├── dto/         # 데이터 전송 객체(요청/응답용)
+│   │       ├── exception/   # 전역 예외 처리 및 커스텀 예외
+│   │       ├── security/    # JWT 및 Spring Security 설정
+│   │       └── config/      # 애플리케이션 전역 설정
 │   └── build.gradle
 └── README.md
 ```
