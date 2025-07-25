@@ -26,15 +26,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");//헤더에서 Authorization의 값 가져오기
-        System.out.println("Authorization Header: " + authHeader);//헤더에서 Authorization의 값 출력
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);//Bearer 제거
-            System.out.println("🔐 Extracted Token: " + token);
 
             if (jwtTokenProvider.validateToken(token)) { // 인증이 유효하다면
                 String email = jwtTokenProvider.getEmail(token);  // 토큰에서 이메일 추출
-                System.out.println("Token Valid. Extracted Email: " + email);
 
                 //인증 객체 생성
                 UsernamePasswordAuthenticationToken authentication =
