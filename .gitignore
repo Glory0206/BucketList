@@ -54,7 +54,6 @@ out/
 
 ### Environment files (민감 정보) ###
 .env
-application.yml
 
 ### Node ###
 node_modules
