@@ -13,9 +13,6 @@ public interface CategoryService {
     // 사용자별 모든 카테고리 조회
     List<CategoryResponse> getAllCategories(String email);
     
-    // 카테고리 조회
-    CategoryResponse getCategory(String email, Long categoryId);
-    
     // 카테고리 수정
     CategoryResponse update(String email, Long categoryId, CategoryRequest request);
     
