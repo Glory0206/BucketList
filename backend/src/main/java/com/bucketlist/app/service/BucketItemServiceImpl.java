@@ -11,7 +11,6 @@ import com.bucketlist.app.dto.FileUploadResponse;
 import com.bucketlist.app.repository.BucketItemRepository;
 import com.bucketlist.app.repository.CategoryRepository;
 import com.bucketlist.app.repository.FileUploadRepository;
-import com.bucketlist.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,16 +26,13 @@ import java.util.ArrayList;
 @Service
 @RequiredArgsConstructor
 public class BucketItemServiceImpl implements BucketItemService{
-    private final UserRepository userRepository;
     private final BucketItemRepository bucketItemRepository;
     private final CategoryRepository categoryRepository;
     private final FileUploadRepository fileUploadRepository;
     private final String uploadDir = System.getProperty("user.dir") + "/../uploads";
 
     @Override
-    public BucketItemResponse create(String email, BucketItemRequest request){// 버킷 리스트 항목 생성
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+    public BucketItemResponse create(User user, BucketItemRequest request){// 버킷 리스트 항목 생성
 
         BucketItem item = BucketItem.builder()
                 .content(request.getContent())
@@ -55,9 +51,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
-    public List<BucketItemResponse> getAllBucketItems(String email){// 해당 사용자의 버킷 리스트 항목 조회
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+    public List<BucketItemResponse> getAllBucketItems(User user){// 해당 사용자의 버킷 리스트 항목 조회
 
         return bucketItemRepository.findByUser(user).stream() // steam: 리스트 반복 처리
                 .map(this::convertToResponse)
@@ -65,9 +59,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
-    public List<BucketItemResponse> getCompletedBucketItems(String email){// 해당 사용자의 완료된 버킷 리스트 항목 조회
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+    public List<BucketItemResponse> getCompletedBucketItems(User user){// 해당 사용자의 완료된 버킷 리스트 항목 조회
 
         return bucketItemRepository.findByUserAndCompleted(user, true).stream()
                 .map(this::convertToResponse)
@@ -75,9 +67,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
-    public List<BucketItemResponse> getIncompleteBucketItems(String email){// 해당 사용자의 미완료된 버킷 리스트 항목 조회
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+    public List<BucketItemResponse> getIncompleteBucketItems(User user){// 해당 사용자의 미완료된 버킷 리스트 항목 조회
 
         return bucketItemRepository.findByUserAndCompleted(user, false).stream()
                 .map(this::convertToResponse)
@@ -122,9 +112,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
-    public String uploadFile(Long id, MultipartFile file, String email){// 버킷 항목 파일 업로드
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+    public String uploadFile(Long id, MultipartFile file, User user){// 버킷 항목 파일 업로드
         
         BucketItem item = bucketItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
@@ -160,9 +148,7 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
-    public void deleteFile(Long id, Long fileId, String email){// 버킷 항목 파일 삭제
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+    public void deleteFile(Long id, Long fileId, User user){// 버킷 항목 파일 삭제
         
         BucketItem item = bucketItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("항목 없음"));
@@ -182,17 +168,11 @@ public class BucketItemServiceImpl implements BucketItemService{
     }
 
     @Override
-    public List<BucketItemResponse> getBucketItemsByCategory(String email, Long categoryId) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+    public List<BucketItemResponse> getBucketItemsByCategory(User user, Long categoryId) {
 
         // 카테고리 존재 및 권한 확인
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
-
-        if (!category.getUser().getEmail().equals(email)) {
-            throw new IllegalArgumentException("해당 카테고리에 접근할 권한이 없습니다.");
-        }
 
         return bucketItemRepository.findByUserAndCategory(user, category).stream()
                 .map(this::convertToResponse)

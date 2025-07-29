@@ -2,19 +2,20 @@ package com.bucketlist.app.service;
 
 import com.bucketlist.app.dto.BucketItemRequest;
 import com.bucketlist.app.dto.BucketItemResponse;
+import com.bucketlist.app.domain.User;
 
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface BucketItemService {
     // 버킷 리스트 항목 생성
-    BucketItemResponse create(String email, BucketItemRequest request);
+    BucketItemResponse create(User user, BucketItemRequest request);
 
 
     //해당 사용자의 버킷 리스트 항목 조회
-    List<BucketItemResponse> getAllBucketItems(String email);
-    List<BucketItemResponse> getCompletedBucketItems(String email);
-    List<BucketItemResponse> getIncompleteBucketItems(String email);
+    List<BucketItemResponse> getAllBucketItems(User user);
+    List<BucketItemResponse> getCompletedBucketItems(User user);
+    List<BucketItemResponse> getIncompleteBucketItems(User user);
 
 
     // 버킷 항목 수정
@@ -30,11 +31,11 @@ public interface BucketItemService {
     void uncomplete(Long id);
 
     // 버킷 항목 파일 업로드
-    String uploadFile(Long id, MultipartFile file, String email);
+    String uploadFile(Long id, MultipartFile file, User user);
 
     // 버킷 항목 파일 삭제
-    void deleteFile(Long id, Long fileId, String email);
+    void deleteFile(Long id, Long fileId, User user);
 
     // 카테고리별 버킷리스트 항목 조회
-    List<BucketItemResponse> getBucketItemsByCategory(String email, Long categoryId);
+    List<BucketItemResponse> getBucketItemsByCategory(User user, Long categoryId);
 }

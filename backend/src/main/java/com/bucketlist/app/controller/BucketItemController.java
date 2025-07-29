@@ -1,8 +1,11 @@
 package com.bucketlist.app.controller;
 
+
 import com.bucketlist.app.dto.BucketItemRequest;
 import com.bucketlist.app.dto.BucketItemResponse;
+import com.bucketlist.app.domain.User;
 import com.bucketlist.app.service.BucketItemService;
+import com.bucketlist.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.ResponseEntity;
@@ -16,35 +19,42 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BucketItemController {
     private final BucketItemService bucketItemService;
+    private final UserRepository userRepository;
+
+    private User getCurrentUser(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();    
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    }
 
     @PostMapping
     public ResponseEntity<BucketItemResponse> create(@RequestBody BucketItemRequest request){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(bucketItemService.create(email, request));
+        User user = getCurrentUser();
+        return ResponseEntity.ok(bucketItemService.create(user, request));
     }
 
     @GetMapping
     public ResponseEntity<List<BucketItemResponse>> getAllBucketItems(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(bucketItemService.getAllBucketItems(email));
+        User user = getCurrentUser();
+        return ResponseEntity.ok(bucketItemService.getAllBucketItems(user));
     }
 
     @GetMapping("/completed")
     public ResponseEntity<List<BucketItemResponse>> getCompletedBucketItems(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(bucketItemService.getCompletedBucketItems(email));
+        User user = getCurrentUser();
+        return ResponseEntity.ok(bucketItemService.getCompletedBucketItems(user));
     }
 
     @GetMapping("/incompleted")
     public ResponseEntity<List<BucketItemResponse>> getIncompletedBucketItems(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(bucketItemService.getIncompleteBucketItems(email));
+        User user = getCurrentUser();
+        return ResponseEntity.ok(bucketItemService.getIncompleteBucketItems(user));
     }
 
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<BucketItemResponse>> getBucketItemsByCategory(@PathVariable Long categoryId){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(bucketItemService.getBucketItemsByCategory(email, categoryId));
+        User user = getCurrentUser();
+        return ResponseEntity.ok(bucketItemService.getBucketItemsByCategory(user, categoryId));
     }
 
     @PutMapping("/{id}")
@@ -73,14 +83,14 @@ public class BucketItemController {
 
     @PostMapping("/bucket-item/{id}/file")
     public ResponseEntity<?> uploadFile(@PathVariable Long id, @RequestParam("file") MultipartFile file){  
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(bucketItemService.uploadFile(id, file, email));
+        User user = getCurrentUser();
+        return ResponseEntity.ok(bucketItemService.uploadFile(id, file, user));
     }
 
     @DeleteMapping("/bucket-item/{id}/file/{fileId}")
     public ResponseEntity<?> deleteFile(@PathVariable Long id, @PathVariable Long fileId){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        bucketItemService.deleteFile(id, fileId, email);
+        User user = getCurrentUser();
+        bucketItemService.deleteFile(id, fileId, user);
         return ResponseEntity.ok("파일 삭제 완료");
     }
 }
