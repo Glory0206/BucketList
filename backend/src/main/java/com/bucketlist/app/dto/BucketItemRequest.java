@@ -8,4 +8,5 @@ import java.time.LocalDate;
 public class BucketItemRequest {
     private String content;
     private LocalDate dueDate;
+    private Long categoryId;
 }

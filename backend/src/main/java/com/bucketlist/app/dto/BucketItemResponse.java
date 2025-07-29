@@ -17,4 +17,5 @@ public class BucketItemResponse {
     private LocalDateTime createdAt;
     private LocalDateTime completedAt;
     private List<FileUploadResponse> files;
+    private CategoryResponse category;
 }

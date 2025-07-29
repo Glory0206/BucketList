@@ -1,12 +1,15 @@
 package com.bucketlist.app.service;
 
 import com.bucketlist.app.domain.BucketItem;
+import com.bucketlist.app.domain.Category;
 import com.bucketlist.app.domain.FileUpload;
 import com.bucketlist.app.domain.User;
 import com.bucketlist.app.dto.BucketItemRequest;
 import com.bucketlist.app.dto.BucketItemResponse;
+import com.bucketlist.app.dto.CategoryResponse;
 import com.bucketlist.app.dto.FileUploadResponse;
 import com.bucketlist.app.repository.BucketItemRepository;
+import com.bucketlist.app.repository.CategoryRepository;
 import com.bucketlist.app.repository.FileUploadRepository;
 import com.bucketlist.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
@@ -25,6 +29,7 @@ import java.util.ArrayList;
 public class BucketItemServiceImpl implements BucketItemService{
     private final UserRepository userRepository;
     private final BucketItemRepository bucketItemRepository;
+    private final CategoryRepository categoryRepository;
     private final FileUploadRepository fileUploadRepository;
     private final String uploadDir = System.getProperty("user.dir") + "/../uploads";
 
@@ -40,25 +45,13 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .user(user)
                 .createdAt(LocalDateTime.now())
                 .files(new ArrayList<>())
+                .category(categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리 없음")))
                 .build();
 
         bucketItemRepository.save(item);
 
-        return BucketItemResponse.builder()
-                .id(item.getId())
-                .content(item.getContent())
-                .completed(item.isCompleted())
-                .dueDate(item.getDueDate())
-                .createdAt(item.getCreatedAt())
-                .completedAt(item.getCompletedAt())
-                .files(item.getFiles().stream()
-                        .map(file -> FileUploadResponse.builder()
-                                .id(file.getId())
-                                .fileName(file.getFileName())
-                                .fileUrl(file.getFileUrl())
-                                .build())
-                        .toList())
-                .build();
+        return convertToResponse(item);
     }
 
     @Override
@@ -67,22 +60,8 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
         return bucketItemRepository.findByUser(user).stream() // steam: 리스트 반복 처리
-                .map(item -> BucketItemResponse.builder()
-                        .id(item.getId())
-                        .content(item.getContent())
-                        .completed(item.isCompleted())
-                        .dueDate(item.getDueDate())
-                        .createdAt(item.getCreatedAt())
-                        .completedAt(item.getCompletedAt())
-                        .files(item.getFiles().stream()
-                                .map(file -> FileUploadResponse.builder()
-                                        .id(file.getId())
-                                        .fileName(file.getFileName())
-                                        .fileUrl(file.getFileUrl())
-                                        .build())
-                                .toList())
-                        .build())
-                .toList();
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -91,22 +70,8 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
         return bucketItemRepository.findByUserAndCompleted(user, true).stream()
-                .map(item -> BucketItemResponse.builder()
-                        .id(item.getId())
-                        .content(item.getContent())
-                        .completed(item.isCompleted())
-                        .dueDate(item.getDueDate())
-                        .createdAt(item.getCreatedAt())
-                        .completedAt(item.getCompletedAt())
-                        .files(item.getFiles().stream()
-                                .map(file -> FileUploadResponse.builder()
-                                        .id(file.getId())
-                                        .fileName(file.getFileName())
-                                        .fileUrl(file.getFileUrl())
-                                        .build())
-                                .toList())
-                        .build())
-                .toList();
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -115,22 +80,8 @@ public class BucketItemServiceImpl implements BucketItemService{
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
         return bucketItemRepository.findByUserAndCompleted(user, false).stream()
-                .map(item -> BucketItemResponse.builder()
-                        .id(item.getId())
-                        .content(item.getContent())
-                        .completed(item.isCompleted())
-                        .dueDate(item.getDueDate())
-                        .createdAt(item.getCreatedAt())
-                        .completedAt(item.getCompletedAt())
-                        .files(item.getFiles().stream()
-                                .map(file -> FileUploadResponse.builder()
-                                        .id(file.getId())
-                                        .fileName(file.getFileName())
-                                        .fileUrl(file.getFileUrl())
-                                        .build())
-                                .toList())
-                        .build())
-                .toList();
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -140,6 +91,8 @@ public class BucketItemServiceImpl implements BucketItemService{
 
         item.setContent(request.getContent());
         item.setDueDate(request.getDueDate()); 
+        item.setCategory(categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리 없음")));
         bucketItemRepository.save(item);
     }
     
@@ -226,5 +179,51 @@ public class BucketItemServiceImpl implements BucketItemService{
         }
 
         fileUploadRepository.delete(fileUpload);
+    }
+
+    @Override
+    public List<BucketItemResponse> getBucketItemsByCategory(String email, Long categoryId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+
+        // 카테고리 존재 및 권한 확인
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
+
+        if (!category.getUser().getEmail().equals(email)) {
+            throw new IllegalArgumentException("해당 카테고리에 접근할 권한이 없습니다.");
+        }
+
+        return bucketItemRepository.findByUserAndCategory(user, category).stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    private BucketItemResponse convertToResponse(BucketItem item) {
+        CategoryResponse categoryInfo = null;
+        if (item.getCategory() != null) {
+            categoryInfo = CategoryResponse.builder()
+                    .id(item.getCategory().getId())
+                    .name(item.getCategory().getName())
+                    .color(item.getCategory().getColor())
+                    .build();
+        }
+    
+        return BucketItemResponse.builder()
+                .id(item.getId())
+                .content(item.getContent())
+                .completed(item.isCompleted())
+                .dueDate(item.getDueDate())
+                .createdAt(item.getCreatedAt())
+                .completedAt(item.getCompletedAt())
+                .category(categoryInfo)
+                .files(item.getFiles().stream()
+                        .map(file -> FileUploadResponse.builder()
+                                .id(file.getId())
+                                .fileName(file.getFileName())
+                                .fileUrl(file.getFileUrl())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
     }
 }
