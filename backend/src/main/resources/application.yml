@@ -4,7 +4,7 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/bucketlist
-    username: postgres
+    username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 
   jpa:

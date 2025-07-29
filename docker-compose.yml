@@ -6,7 +6,7 @@ services:
       - .env
     environment:
       POSTGRES_DB: bucketlist
-      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
@@ -22,7 +22,7 @@ services:
       - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/bucketlist
-      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       MAIL_EMAIL: ${MAIL_EMAIL}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
