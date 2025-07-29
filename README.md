@@ -214,12 +214,13 @@ npm run dev
 | GET | `/api/bucket` | 전체 버킷리스트 조회 |
 | GET | `/api/bucket/completed` | 완료된 버킷리스트 조회 |
 | GET | `/api/bucket/incompleted` | 미완료 버킷리스트 조회 |
-| POST | `/api/bucket` | 버킷리스트 생성 |
-| PUT | `/api/bucket/{id}` | 버킷리스트 수정 |
+| POST | `/api/bucket` | 버킷리스트 항목 생성 |
+| PUT | `/api/bucket/{id}` | 버킷리스트 항목 수정 |
 | PUT | `/api/bucket/{id}/complete` | 버킷리스트 항목 완료 처리 |
 | PUT | `/api/bucket/{id}/uncomplete` | 버킷리스트 항목 미완료(완료 취소) 처리 |
-| DELETE | `/api/bucket/{id}` | 버킷리스트 삭제 |
+| DELETE | `/api/bucket/{id}` | 버킷리스트 항목 삭제 |
 | POST | `/api/bucket/bucket-item/{id}/file` | 파일 업로드 |
+| DELETE | `/api/bucket/bucket-item/{id}/file/{fileId}` | 파일 삭제 |
 
 ---
 
