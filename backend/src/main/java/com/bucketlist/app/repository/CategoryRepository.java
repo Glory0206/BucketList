@@ -1,6 +1,7 @@
 package com.bucketlist.app.repository;
 
 import com.bucketlist.app.domain.Category;
+import com.bucketlist.app.domain.BucketItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
