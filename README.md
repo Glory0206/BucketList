@@ -45,6 +45,7 @@ BucketList는 사용자가 개인적인 버킷리스트를 생성하고 관리�
 - 완료/미완료 상태 관리
 - 전체 목록 및 분류별 조회
 - 파일 업로드 기능
+- 카테고리별 분류 및 관리
 
 ### ⚙️ 시스템 및 인프라
 - Spring AOP 기반 API 실행 시간 로깅  
@@ -222,6 +223,15 @@ npm run dev
 | POST | `/api/bucket/bucket-item/{id}/file` | 파일 업로드 |
 | DELETE | `/api/bucket/bucket-item/{id}/file/{fileId}` | 파일 삭제 |
 
+### 카테고리 관리 API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/category` | 사용자별 모든 카테고리 조회 |
+| POST | `/api/category` | 카테고리 생성 |
+| PUT | `/api/category/{id}` | 카테고리 수정 |
+| DELETE | `/api/category/{id}` | 카테고리 삭제 |
+
 ---
 
 ## 🔧 개발 과정
@@ -236,6 +246,7 @@ npm run dev
 - Spring Security 설정
 - RESTful API 개발
 - 파일 업로드 기능 구현
+- 카테고리 관리 시스템 구현
 
 ### 3. 프론트엔드 개발
 - React Router를 활용한 라우팅
@@ -255,7 +266,7 @@ npm run dev
 
 ### 단기 계획
 - [ ] 사용자 프로필 관리 기능
-- [ ] 버킷리스트 카테고리 분류
+- [o] 버킷리스트 카테고리 분류
 - [ ] 진행률 시각화 (차트, 그래프)
 
 ### 중기 계획

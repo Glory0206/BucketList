@@ -41,6 +41,12 @@ public class BucketItemController {
         return ResponseEntity.ok(bucketItemService.getIncompleteBucketItems(email));
     }
 
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<BucketItemResponse>> getBucketItemsByCategory(@PathVariable Long categoryId){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(bucketItemService.getBucketItemsByCategory(email, categoryId));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody BucketItemRequest request){
         bucketItemService.update(id, request);

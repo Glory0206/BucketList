@@ -34,4 +34,7 @@ public interface BucketItemService {
 
     // 버킷 항목 파일 삭제
     void deleteFile(Long id, Long fileId, String email);
+
+    // 카테고리별 버킷리스트 항목 조회
+    List<BucketItemResponse> getBucketItemsByCategory(String email, Long categoryId);
 }

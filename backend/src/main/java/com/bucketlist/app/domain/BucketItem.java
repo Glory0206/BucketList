@@ -33,6 +33,10 @@ public class BucketItem {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = true)
+    private Category category;
+
     @OneToMany(mappedBy = "bucketItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileUpload> files = new ArrayList<>();
 
