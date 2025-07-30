@@ -52,6 +52,25 @@ function ItemDetailModal({ isOpen, onClose, item, refreshItem }) {
             ></button>
           </div>
           <div className="modal-body">
+            {item.category && (
+              <div className="mb-3">
+                <h6 className="text-success">카테고리</h6>
+                <p className="mb-0">
+                  <span
+                    className="badge"
+                    style={{
+                      backgroundColor: item.category.color,
+                      color: '#fff',
+                      fontSize: '0.9em',
+                      padding: '0.4em 0.6em',
+                      borderRadius: '0.4em'
+                    }}
+                  >
+                    {item.category.name}
+                  </span>
+                </p>
+              </div>
+            )}
             <div className="mb-3">
               <h6 className="text-success">내용</h6>
               <p className="mb-0">{item.content}</p>
