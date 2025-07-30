@@ -1,9 +1,8 @@
 package com.bucketlist.app.controller;
 
-import com.bucketlist.app.dto.UserLoginRequest;
-import com.bucketlist.app.dto.ResetPasswordRequest;
-import com.bucketlist.app.dto.CreatePasswordCordRequest;
-import com.bucketlist.app.dto.UserSignupRequest;
+import com.bucketlist.app.dto.*;
+import com.bucketlist.app.security.JwtTokenProvider;
+import com.bucketlist.app.service.RefreshTokenService;
 import com.bucketlist.app.service.ResetPasswordService;
 import com.bucketlist.app.service.UserService;
 import jakarta.validation.Valid;
@@ -20,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final UserService userService;
     private final ResetPasswordService resetPasswordService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid UserSignupRequest request){
@@ -46,5 +47,27 @@ public class AuthController {
         } else {
             return ResponseEntity.badRequest().body("비밀번호 변경에 실패했습니다.");
         }
+    }
+
+    @PostMapping("/token-reissue")
+    public ResponseEntity<?> tokenReissue(@RequestBody @Valid TokenReissueRequest request){
+        // Aceess Token에서 email을 추출(만료된 토큰이어도 Claims는 추출 가능)
+        // Claims: JWT 토큰 안에 들어있는 사용자 정보
+        String email;
+        try{
+            email = jwtTokenProvider.getEmail(request.getAccessToken());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("유효하지 않은 Access Token입니다.");
+        }
+
+        // refresh Token 유효성 검증
+        if(!refreshTokenService.isValid(email, request.getRefreshToken())){
+            return ResponseEntity.status(401).body("Refresh Token이 유효하지 않습니다.");
+        }
+
+        // 새 Access Token 발급
+        String newAccessToken = jwtTokenProvider.createAccessToken(email);
+
+        return ResponseEntity.ok().body(newAccessToken);
     }
 }
