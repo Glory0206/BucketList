@@ -6,9 +6,23 @@ import BucketListSplit from './pages/BucketListSplit';
 import Home from './pages/Home';
 import Header from './components/Header';
 
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { setNavigator } from './utils/navigate';
+
+function NavigatorInitializer() {
+  const nav = useNavigate();
+  useEffect(() => {
+    setNavigator(nav);
+  }, [nav]);
+
+  return null;
+}
+
 function App() {
   return (
     <Router>
+      <NavigatorInitializer />
       <Header/>
       <Routes>
         <Route path='/' element={<Home />} />
