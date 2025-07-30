@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import api from '../services/api';
+import { uploadFile, deleteFile } from '../services/fileService';
 
 function ItemDetailModal({ isOpen, onClose, item, refreshItem }) {
   if (!isOpen || !item) return null;
@@ -14,11 +14,7 @@ function ItemDetailModal({ isOpen, onClose, item, refreshItem }) {
     if (!file) return;
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      await api.post(`/bucket/bucket-item/${item.id}/file`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await uploadFile(item.id, file);
       if (refreshItem) refreshItem();
     } catch (err) {
       alert('파일 업로드 실패');
@@ -33,7 +29,7 @@ function ItemDetailModal({ isOpen, onClose, item, refreshItem }) {
     if (!window.confirm('정말 파일을 삭제하시겠습니까?')) return;
     setDeleting(true);
     try {
-      await api.delete(`/bucket/bucket-item/${item.id}/file/${fileId}`);
+      await deleteFile(item.id, fileId);
       if (refreshItem) refreshItem();
     } catch (err) {
       alert('파일 삭제에 실패했습니다.');
