@@ -34,7 +34,7 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성
-    private String createToken(String email){
+    public String createAccessToken(String email){
         return generateToken(email, validityInMs);
     }
 
