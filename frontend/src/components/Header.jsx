@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { logout } from '../utils/auth';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Header(){
@@ -7,9 +8,7 @@ function Header(){
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('nickname');
-        navigate('/login'); // 로그아웃 후 로그인 페이지로 이동
+        logout(navigate)
     };
 
     return(

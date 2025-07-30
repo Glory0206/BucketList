@@ -29,20 +29,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);//Bearer 제거
-
-            if (jwtTokenProvider.validateToken(token)) { // 인증이 유효하다면
-                String email = jwtTokenProvider.getEmail(token);  // 토큰에서 이메일 추출
-
-                //인증 객체 생성
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(email, null, null);
-
-                // 인증 객체에 요청 정보 부여
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // SecurityContext에 인증 객체 저장
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            try {
+                if (jwtTokenProvider.validateToken(token)) { // 인증이 유효하다면
+                    String email = jwtTokenProvider.getEmail(token);  // 토큰에서 이메일 추출
+    
+                    //인증 객체 생성
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(email, null, null);
+    
+                    // 인증 객체에 요청 정보 부여
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+    
+                    // SecurityContext에 인증 객체 저장
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (io.jsonwebtoken.ExpiredJwtException e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "토큰이 만료되었습니다.");
+                return;
+            } catch(io.jsonwebtoken.JwtException | IllegalArgumentException e){
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰입니다.");
+                return;
             }
+
         }
         filterChain.doFilter(request, response);  // 다음 필터로 진행
     }

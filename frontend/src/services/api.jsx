@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { logout } from '../utils/auth';
+import { goTo } from '../utils/navigate';
 
 // API 요청을 보낼 때마다 /api 자동 추가
 const api = axios.create({
@@ -13,5 +15,17 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// ✅ 응답 직후 - 토큰 만료 시 자동 로그아웃
+api.interceptors.response.use(
+  res => res,
+  err => {
+    if (err.response?.status === 401 || err.response?.status === 403) {
+      alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+      logout();
+    }
+    return Promise.reject(err);
+  }
+);
 
 export default api;
