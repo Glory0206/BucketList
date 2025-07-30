@@ -1,51 +1,73 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";
+import { 
+  getAllBuckets, 
+  createBucket, 
+  deleteBucket, 
+  updateBucket 
+} from "../services/bucketService";
+import { getCategories } from "../services/categoryService";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import EditModeToggle from "../components/EditModeToggle";
 import EditSaveCancelButtons from "../components/EditSaveCancelButtons";
 import EditActionButtons from "../components/EditActionButtons";
 import ItemDetailModal from "../components/ItemDetailModal";
+import CategoryCreateModal from "../components/CategoryCreateModal";
+import CategoryListModal from "../components/CategoryListModal";
 
 function BucketListAll() {
   const [items, setItems] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newItem, setNewItem] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [dueDate, setDueDate] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
   const [editContent, setEditContent] = useState('');
+  const [editSelectedCategory, setEditSelectedCategory] = useState('');
   const [editDueDate, setEditDueDate] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const dateInputRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchItems = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await api.get('/bucket');
-        setItems(response.data);
+        const [itemsResponse, categoriesResponse] = await Promise.all([
+          getAllBuckets(),
+          getCategories()
+        ]);
+        setItems(itemsResponse);
+        setCategories(categoriesResponse);
       } catch (error) {
         setItems([]);
-        const msg = error.response?.data?.message || '버킷리스트를 불러오지 못했습니다.';
+        setCategories([]);
+        const msg = error.response?.data?.message || '데이터를 불러오지 못했습니다.';
         alert(msg);
       } finally {
         setLoading(false);
       }
     };
-    fetchItems();
+    fetchData();
   }, []);
 
   const handleAddItem = async () => {
     if (!newItem.trim()) return;
     try {
-      const response = await api.post('/bucket', { content: newItem, dueDate: dueDate ? dueDate.toISOString().split('T')[0] : null });
-      if (response.data) {
-        setItems([...items, response.data]);
+      const response = await createBucket({ 
+        content: newItem, 
+        categoryId: selectedCategory || null,
+        dueDate 
+      });
+      if (response) {
+        setItems([...items, response]);
         setNewItem('');
+        setSelectedCategory('');
         setDueDate(null);
       } else {
         alert('버킷 아이템 등록에 실패했습니다.');
@@ -56,11 +78,16 @@ function BucketListAll() {
     }
   };
 
+  // 카테고리 생성 핸들러
+  const handleCategoryCreate = (newCategory) => {
+    setCategories([...categories, newCategory]);
+  };
+
   // 삭제 기능
   const handleDelete = async (id) => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
     try {
-      await api.delete(`/bucket/${id}`);
+      await deleteBucket(id);
       setItems(items.filter(item => item.id !== id));
     } catch (error) {
       const msg = error.response?.data?.message || '삭제 중 오류가 발생했습니다.';
@@ -72,6 +99,7 @@ function BucketListAll() {
   const handleEdit = (item) => {
     setEditId(item.id);
     setEditContent(item.content);
+    setEditSelectedCategory(item.category?.id?.toString() || '');
     setEditDueDate(item.dueDate ? new Date(item.dueDate) : null);
   };
 
@@ -79,6 +107,7 @@ function BucketListAll() {
   const handleCancelEdit = () => {
     setEditId(null);
     setEditContent('');
+    setEditSelectedCategory('');
     setEditDueDate(null);
   };
 
@@ -86,13 +115,20 @@ function BucketListAll() {
   const handleSaveEdit = async (id) => {
     if (!editContent.trim()) return;
     try {
-      await api.put(`/bucket/${id}`, {
-        content: editContent,
-        dueDate: editDueDate ? editDueDate.toISOString().split('T')[0] : null
+      await updateBucket({ 
+        id, 
+        content: editContent, 
+        categoryId: editSelectedCategory || null,
+        dueDate: editDueDate 
       });
       setItems(items.map(item =>
         item.id === id
-          ? { ...item, content: editContent, dueDate: editDueDate ? editDueDate.toISOString().split('T')[0] : null }
+          ? { 
+              ...item, 
+              content: editContent, 
+              category: categories.find(cat => cat.id.toString() === editSelectedCategory),
+              dueDate: editDueDate ? editDueDate.toISOString().split('T')[0] : null 
+            }
           : item
       ));
       handleCancelEdit();
@@ -110,9 +146,9 @@ function BucketListAll() {
 
   // 모달에서 사용할 최신 아이템 갱신 함수
   const refreshAndSelect = async (id) => {
-    const res = await api.get('/bucket');
-    setItems(res.data);
-    const updated = res.data.find(i => i.id === id);
+    const res = await getAllBuckets();
+    setItems(res);
+    const updated = res.find(i => i.id === id);
     setSelectedItem(updated);
   };
 
@@ -130,9 +166,14 @@ function BucketListAll() {
         <div className="container p-4 bg-white shadow-lg rounded" style={{ maxWidth: '600px' }}>
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h2 className="text-success mb-0">BucketList (전체)</h2>
-            <button className="btn btn-outline-success btn-sm" onClick={() => navigate('/bucketlist/split')}>
-              미완료/완료 분리 보기
-            </button>
+            <div>
+              <button className="btn btn-outline-info btn-sm me-2" onClick={() => setCategoryModalOpen(true)}>
+                카테고리 관리
+              </button>
+              <button className="btn btn-outline-success btn-sm" onClick={() => navigate('/bucketlist/split')}>
+                미완료/완료 분리 보기
+              </button>
+            </div>
           </div>
           <div className="mb-3 text-end">
             <EditModeToggle editMode={editMode} setEditMode={setEditMode} />
@@ -147,6 +188,19 @@ function BucketListAll() {
               onKeyDown={e => { if (e.key === "Enter") handleAddItem(); }}
               style={{ zIndex: 1 }}
             />
+            <select
+              className="form-select"
+              value={selectedCategory}
+              onChange={e => setSelectedCategory(e.target.value)}
+              style={{ maxWidth: '150px' }}
+            >
+              <option value="">카테고리 선택</option>
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
             <ReactDatePicker
               selected={dueDate}
               onChange={date => setDueDate(date)}
@@ -194,6 +248,19 @@ function BucketListAll() {
                         onChange={e => setEditContent(e.target.value)}
                         style={{ maxWidth: 200 }}
                       />
+                      <select
+                        className="form-select me-2"
+                        value={editSelectedCategory}
+                        onChange={e => setEditSelectedCategory(e.target.value)}
+                        style={{ maxWidth: 120 }}
+                      >
+                        <option value="">카테고리 선택</option>
+                        {categories.map(category => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </select>
                       <ReactDatePicker
                         selected={editDueDate}
                         onChange={date => setEditDueDate(date)}
@@ -216,6 +283,18 @@ function BucketListAll() {
                         title="클릭하여 상세보기"
                       >
                         {item.content}
+                        {item.category && (
+                          <span 
+                            className="badge me-2" 
+                            style={{ 
+                              backgroundColor: item.category.color, 
+                              color: '#fff',
+                              fontSize: '0.8em'
+                            }}
+                          >
+                            {item.category.name}
+                          </span>
+                        )}
                         {item.dueDate && (
                           <span style={{ color: '#198754', fontSize: '0.9em', marginLeft: 8 }}>
                             ({new Date(item.dueDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })})
@@ -245,6 +324,12 @@ function BucketListAll() {
         onClose={handleCloseModal}
         item={selectedItem}
         refreshItem={() => refreshAndSelect(selectedItem.id)}
+      />
+      
+      <CategoryListModal
+        open={categoryModalOpen}
+        onClose={() => setCategoryModalOpen(false)}
+        onCreate={handleCategoryCreate}
       />
     </div>
   );

@@ -16,7 +16,7 @@ function Header(){
         <nav className=''>
             <div className='d-flex px-4 py-3 border-bottom border-success'>
                 <Link to="/" className="navbar-brand fw-bold text-success">BucketList</Link>
-                <div className='ms-auto'>
+                <div className='ms-auto d-flex align-items-center'>
                     {isLoggedIn ? (
                         <>
                             <span className="me-3 fw-bold text-success">{nickname ? `${nickname}님` : '사용자'}</span>
