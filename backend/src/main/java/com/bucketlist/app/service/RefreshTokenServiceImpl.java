@@ -1,7 +1,7 @@
 package com.bucketlist.app.service;
 
 import com.bucketlist.app.domain.RefreshToken;
-import com.bucketlist.app.repository.RefreshTokenRepository;
+import com.bucketlist.app.repository.redis.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

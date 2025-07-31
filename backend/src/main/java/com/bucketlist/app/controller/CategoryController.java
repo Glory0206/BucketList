@@ -2,7 +2,7 @@ package com.bucketlist.app.controller;
 
 import com.bucketlist.app.dto.CategoryRequest;
 import com.bucketlist.app.dto.CategoryResponse;
-import com.bucketlist.app.repository.UserRepository;
+import com.bucketlist.app.repository.jpa.UserRepository;
 import com.bucketlist.app.domain.User;
 import com.bucketlist.app.service.CategoryService;
 import lombok.RequiredArgsConstructor;

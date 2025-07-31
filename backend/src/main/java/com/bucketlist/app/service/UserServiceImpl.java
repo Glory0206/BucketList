@@ -4,7 +4,7 @@ import com.bucketlist.app.domain.User;
 import com.bucketlist.app.dto.UserLoginRequest;
 import com.bucketlist.app.dto.UserLoginResponse;
 import com.bucketlist.app.dto.UserSignupRequest;
-import com.bucketlist.app.repository.UserRepository;
+import com.bucketlist.app.repository.jpa.UserRepository;
 import com.bucketlist.app.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 
@@ -48,6 +48,6 @@ public class UserServiceImpl implements UserService{
 
         refreshTokenService.save(user.getEmail(), refreshToken);
 
-        return new UserLoginResponse(accessToken, refreshToken, user.getNickname());
+        return new UserLoginResponse(accessToken, user.getNickname());
     }
 }
