@@ -12,7 +12,8 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final String secretKey;
-    private final long validityInMs = 60 * 15 * 1000L; // Access Token 유효시간: 15분
+    private final long validityInMs = 10 * 1000L;
+    // private final long validityInMs = 60 * 15 * 1000L; // Access Token 유효시간: 15분
     private final long refreshValidityInMs = 7 * 24 * 60 * 60 * 1000L; // Refresh Token 유효시간: 7일
     private final Key key;
 
@@ -49,6 +50,20 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    // 토큰에서 이메일 추출(Access Token 만료시)
+    public String getEmailAllowExpired(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims().getSubject();
+        }
     }
 
     // 토큰 유효 확인

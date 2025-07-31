@@ -1,6 +1,8 @@
 package com.bucketlist.app.controller;
 
+import com.bucketlist.app.domain.RefreshToken;
 import com.bucketlist.app.dto.*;
+import com.bucketlist.app.repository.redis.RefreshTokenRepository;
 import com.bucketlist.app.security.JwtTokenProvider;
 import com.bucketlist.app.service.RefreshTokenService;
 import com.bucketlist.app.service.ResetPasswordService;
@@ -8,6 +10,7 @@ import com.bucketlist.app.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +24,7 @@ public class AuthController {
     private final ResetPasswordService resetPasswordService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid UserSignupRequest request){
@@ -31,6 +35,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest request){
         return ResponseEntity.ok().body(userService.login(request));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        refreshTokenService.delete(email);
+        return ResponseEntity.ok("로그아웃 되었습니다.");
     }
 
     @PostMapping("/create-code")
@@ -54,14 +65,12 @@ public class AuthController {
         // Aceess Token에서 email을 추출(만료된 토큰이어도 Claims는 추출 가능)
         // Claims: JWT 토큰 안에 들어있는 사용자 정보
         String email;
-        try{
-            email = jwtTokenProvider.getEmail(request.getAccessToken());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("유효하지 않은 Access Token입니다.");
-        }
+        email = jwtTokenProvider.getEmailAllowExpired(request.getAccessToken());
 
-        // refresh Token 유효성 검증
-        if(!refreshTokenService.isValid(email, request.getRefreshToken())){
+        RefreshToken storedToken = refreshTokenRepository.findById(email)
+                .orElseThrow(() -> new IllegalArgumentException("Refresh Token이 존재하지 않습니다."));
+
+        if (!refreshTokenService.isValid(email, storedToken.getToken())) {
             return ResponseEntity.status(401).body("Refresh Token이 유효하지 않습니다.");
         }
 
