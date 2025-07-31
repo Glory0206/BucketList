@@ -4,7 +4,7 @@ import com.bucketlist.app.domain.Category;
 import com.bucketlist.app.domain.User;
 import com.bucketlist.app.dto.CategoryRequest;
 import com.bucketlist.app.dto.CategoryResponse;
-import com.bucketlist.app.repository.CategoryRepository;
+import com.bucketlist.app.repository.jpa.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

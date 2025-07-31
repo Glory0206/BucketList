@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {login} from '../services/auth';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -11,13 +12,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
-      const res = await axios.post('http://localhost:8080/api/auth/login', {email, password});
-
-      const token = res.data.token;
-      const nickname = res.data.nickname;
-      localStorage.setItem('token', token);
-      localStorage.setItem('nickname', nickname);
-
+      await login(email, password);
       navigate('/bucketlist/all');
     } catch(err){
       const msg = err.response?.data?.message || '서버 오류';

@@ -9,7 +9,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import com.bucketlist.app.domain.User;
-import com.bucketlist.app.repository.UserRepository;
+import com.bucketlist.app.repository.jpa.UserRepository;
 import com.bucketlist.app.dto.ResetPasswordRequest;
 
 import lombok.RequiredArgsConstructor;

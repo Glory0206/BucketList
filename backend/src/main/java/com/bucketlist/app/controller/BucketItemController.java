@@ -5,7 +5,7 @@ import com.bucketlist.app.dto.BucketItemRequest;
 import com.bucketlist.app.dto.BucketItemResponse;
 import com.bucketlist.app.domain.User;
 import com.bucketlist.app.service.BucketItemService;
-import com.bucketlist.app.repository.UserRepository;
+import com.bucketlist.app.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.ResponseEntity;

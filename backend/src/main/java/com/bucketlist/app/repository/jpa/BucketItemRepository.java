@@ -1,4 +1,4 @@
-package com.bucketlist.app.repository;
+package com.bucketlist.app.repository.jpa;
 
 import com.bucketlist.app.domain.User;
 import com.bucketlist.app.domain.BucketItem;

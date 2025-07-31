@@ -1,5 +1,6 @@
 package com.bucketlist.app.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserLoginResponse {
+public class TokenReissueRequest {
+    @NotBlank(message = "Access Token은 필수입니다.")
     private String accessToken;
-    private String nickname;
-} 
+}

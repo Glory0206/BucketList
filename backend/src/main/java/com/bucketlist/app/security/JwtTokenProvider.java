@@ -12,7 +12,9 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final String secretKey;
-    private final long validityInMs = 3600000; // 토큰 유효 기간 1시간
+    private final long validityInMs = 10 * 1000L;
+    // private final long validityInMs = 60 * 15 * 1000L; // Access Token 유효시간: 15분
+    private final long refreshValidityInMs = 7 * 24 * 60 * 60 * 1000L; // Refresh Token 유효시간: 7일
     private final Key key;
 
     public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey) {
@@ -20,10 +22,9 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    // 토큰 생성
-    public String createToken(String email) {
+    private String generateToken(String email, long validity){
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + validityInMs);
+        Date expiry = new Date(now.getTime() + validity);
 
         return Jwts.builder()
                 .setSubject(email) // email을 식별자로 사용
@@ -33,12 +34,36 @@ public class JwtTokenProvider {
                 .compact(); // JWT 문자열 생성
     }
 
+    // Access Token 생성
+    public String createAccessToken(String email){
+        return generateToken(email, validityInMs);
+    }
+
+    // Refresh Token 생성
+    public String createRefreshToken(String email) {
+        return generateToken(email, refreshValidityInMs);
+    }
+
     // 토큰에서 이메일 추출
     public String getEmail(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    // 토큰에서 이메일 추출(Access Token 만료시)
+    public String getEmailAllowExpired(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims().getSubject();
+        }
     }
 
     // 토큰 유효 확인

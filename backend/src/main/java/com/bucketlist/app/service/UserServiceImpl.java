@@ -4,7 +4,7 @@ import com.bucketlist.app.domain.User;
 import com.bucketlist.app.dto.UserLoginRequest;
 import com.bucketlist.app.dto.UserLoginResponse;
 import com.bucketlist.app.dto.UserSignupRequest;
-import com.bucketlist.app.repository.UserRepository;
+import com.bucketlist.app.repository.jpa.UserRepository;
 import com.bucketlist.app.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +17,7 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public void signup(UserSignupRequest request){// 회원가입
@@ -42,8 +43,11 @@ public class UserServiceImpl implements UserService{
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        String token = jwtTokenProvider.createToken(user.getEmail());
+        String accessToken = jwtTokenProvider.createAccessToken(user.getEmail());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail());
 
-        return new UserLoginResponse(token, user.getNickname());
+        refreshTokenService.save(user.getEmail(), refreshToken);
+
+        return new UserLoginResponse(accessToken, user.getNickname());
     }
 }

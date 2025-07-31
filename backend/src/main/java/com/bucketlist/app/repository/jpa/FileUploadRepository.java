@@ -1,4 +1,4 @@
-package com.bucketlist.app.repository;
+package com.bucketlist.app.repository.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

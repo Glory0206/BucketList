@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { logout } from '../utils/auth';
+import { logout } from '../services/auth';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Header(){
