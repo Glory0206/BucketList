@@ -16,6 +16,12 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  # redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   output:
     ansi:
       enabled: always
@@ -45,12 +51,6 @@ spring:
           ssl:
             trust: ${MAIL_HOST}
     default-encoding: UTF-8
-
-  # redis
-  data:
-    redis:
-      host: localhost
-      port: 6379
 
 jwt:
   secret-key: ${JWT_SECRET_KEY}
