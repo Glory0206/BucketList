@@ -45,9 +45,6 @@ spring:
       mail:
         smtp:
           auth: true
-          starttls:
-            enable: true
-            required: true
           ssl:
             trust: ${MAIL_HOST}
     default-encoding: UTF-8
