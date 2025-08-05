@@ -76,6 +76,7 @@ BucketList는 사용자가 개인적인 버킷리스트를 생성하고 관리�
 - **Spring Mail** - 이메일 서비스
 - **Spring AOP** - API 실행 시간 로깅
 - **Global Exception Handling** - 일관된 예외 응답
+- **Redis** - Refresh 저장용
 
 ### Development Tools
 - **Java 17** - 백엔드 개발 언어
@@ -205,8 +206,10 @@ npm run dev
 |--------|----------|-------------|
 | POST | `/api/auth/signup` | 회원가입 |
 | POST | `/api/auth/login` | 로그인 |
+| POST | `/api/auth/logout` | 로그아웃 |
 | POST | `/api/auth/create-code` | 비밀번호 재설정 코드 생성 |
 | POST | `/api/auth/reset-password` | 비밀번호 재설정 |
+| POST | `/api/auth/token-reissue` | Access Token 재발급(Refresh Token 기반) |
 
 ### 버킷리스트 API
 
