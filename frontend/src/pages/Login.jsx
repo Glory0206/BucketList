@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { login, requestResetPasswordCode } from '../services/auth';
+import { login, requestResetPasswordCode, resetPassword } from '../services/auth';
 
 function Login() {
   const [codeSent, setCodeSent] = useState(false);

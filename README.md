@@ -128,10 +128,8 @@ POSTGRES_PASSWORD=your_secure_password_here
 # JWT 설정
 JWT_SECRET_KEY=your_jwt_secret_key_here_make_it_long_and_secure
 
-# 이메일 설정 (Gmail 사용 예시)
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_EMAIL=your_email@gmail.com
+# 이메일 설정 (Naver)
+MAIL_EMAIL=your_naver_email@naver.com
 MAIL_PASSWORD=your_app_password_here
 
 ```
