@@ -118,7 +118,7 @@ BucketList/
 
 ### 0. 환경 변수 설정 (공통)
 
-프로젝트 루트 디렉토리에 `.env` 파일을 생성하고 다음 내용을 작성하세요:
+`.env` 파일을 생성하고 다음 내용을 작성하세요:
 
 ```bash
 # 데이터베이스 설정
@@ -132,18 +132,22 @@ JWT_SECRET_KEY=your_jwt_secret_key_here_make_it_long_and_secure
 MAIL_EMAIL=your_naver_email@naver.com
 MAIL_PASSWORD=your_app_password_here
 
+#Redis(local 실행 시 SPRING_REDIS_HOST=localhost)
+SPRING_REDIS_HOST=redis
+
 ```
 
 **중요한 설정 사항:**
-- `POSTGRES_USER`: PostgreSQL User 이름름
+- `POSTGRES_USER`: PostgreSQL User 이름
 - `POSTGRES_PASSWORD`: PostgreSQL 데이터베이스 비밀번호
 - `JWT_SECRET_KEY`: JWT 토큰 서명에 사용되는 비밀키 (최소 32자 이상의 랜덤 문자열 권장)
 - `MAIL_EMAIL`: Gmail 계정 (비밀번호 재설정 기능에 사용)
 - `MAIL_PASSWORD`: Gmail 앱 비밀번호 (Gmail 2단계 인증 설정 후 생성)
 
-**Gmail 앱 비밀번호 설정 방법:**
-1. Gmail 계정에서 2단계 인증 활성화
-2. Google 계정 설정 → 보안 → 앱 비밀번호 생성
+**Naver 앱 비밀번호 설정 방법:**
+1. Naver 계정에서 2단계 인증 활성화
+2. Naver 계정 로그인 → 내 정보 → 보안 설정 → 앱 비밀번호 관리
+3. 새 앱 비밀번호 생성 클릭(이름 예시: BucketList)
 3. 생성된 16자리 앱 비밀번호를 `MAIL_PASSWORD`에 입력
 
 ### 1. Docker Compose로 실행 (추천)
