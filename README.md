@@ -141,8 +141,8 @@ SPRING_REDIS_HOST=redis
 - `POSTGRES_USER`: PostgreSQL User 이름
 - `POSTGRES_PASSWORD`: PostgreSQL 데이터베이스 비밀번호
 - `JWT_SECRET_KEY`: JWT 토큰 서명에 사용되는 비밀키 (최소 32자 이상의 랜덤 문자열 권장)
-- `MAIL_EMAIL`: Gmail 계정 (비밀번호 재설정 기능에 사용)
-- `MAIL_PASSWORD`: Gmail 앱 비밀번호 (Gmail 2단계 인증 설정 후 생성)
+- `MAIL_EMAIL`: Naver 계정 (비밀번호 재설정 기능에 사용)
+- `MAIL_PASSWORD`: Naver 앱 비밀번호 (Naver 2단계 인증 설정 후 생성)
 
 **Naver 앱 비밀번호 설정 방법:**
 1. Naver 계정에서 2단계 인증 활성화
